@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:ecommerce/Auth/auth.dart';
+import 'package:ecommerce/Auth/signin/login.dart';
 import 'package:ecommerce/Onbording/onboarding.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Timer(Duration(milliseconds: 3),(){
       Navigator.push(context,
-      MaterialPageRoute(builder: (context) => Onboarding(),));
+      MaterialPageRoute(builder: (context) => Auth(),));
     });
   }
   @override

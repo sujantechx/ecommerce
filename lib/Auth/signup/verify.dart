@@ -26,7 +26,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            const Text("We just sent a verification code to your email"),
+            const Text("We just sent a verification code to email"),
             const SizedBox(height: 20),
 
             // OTP field
@@ -48,7 +48,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.orange,
                 minimumSize: const Size(double.infinity, 50),
               ),
               child: const Text("Verify"),
