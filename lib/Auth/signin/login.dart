@@ -1,4 +1,5 @@
 import 'package:ecommerce/Auth/signin/recovery_method.dart';
+import 'package:ecommerce/ui_screen/home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -73,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const SizedBox(height: 16),
                       const Text(
-                        "Account Verified successfully",
+                        "Account Verified to Login", //"Account Verified successfully",
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 20),
@@ -113,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => const RecoveryMethodScreen()),
+                                  builder: (_) =>  RecoveryMethodScreen()),
                             );
                           },
                           child: const Text("Forgot Password?"),
@@ -133,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => const VerifyAccountScreen()),
+                                    builder: (_) => const Home()),
                               );
                             } else {
                               setState(() {
