@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AuthProvider extends ChangeNotifier {
-  String _dummyEmail = "BeeBello@gmail.com";
+  String _dummyEmail = "Sujan@gmail.com";
   String _dummyPassword = "123456";
 
   bool login(String email, String password) {

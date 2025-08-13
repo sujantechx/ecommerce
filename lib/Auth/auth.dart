@@ -1,5 +1,6 @@
 import 'package:ecommerce/Auth/signin/login.dart';
 import 'package:ecommerce/Auth/signup/sign_up.dart';
+import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -63,46 +64,18 @@ class _AuthState extends State<Auth> {
 
 
                     // Login Button
-                    SizedBox(
-                      width: double.infinity,
-
-                      child: ElevatedButton(
-                        onPressed: () {
+                    UiButtonHelper().CustomButtonFlex(
+                        callback: () {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => SignupScreen(),));
-
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text("Sign Up"),
-                      ),
-                    ),
+                        buttonName: "Sign Up"),
                     const SizedBox(height: 16),
 
-                    SizedBox(
-                      width: double.infinity,
-
-                      child: ElevatedButton(
-                        onPressed: () {
+                    UiButtonHelper().CustomButtonFlex(
+                        callback: () {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(),));
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text("Login"),
-                      ),
-                    ),
-
+                        buttonName: "Login"),
                     const SocialLoginButtons(),
                     const SizedBox(height: 20),
                   ],

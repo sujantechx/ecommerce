@@ -1,3 +1,4 @@
+import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
@@ -96,24 +97,21 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
 
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          otp.length == 6?() {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (_) => const LoginScreen()),
-                            );
-                          }:null; //
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: otp.length ==6? Colors.orange:Colors.orange.shade200,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),),
-                        child: const Text("Verify"),
-                      ),
+                      child: UiButtonHelper().CustomButtom(
+                          callback: () {
+                            otp.length == 6?() {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                              );
+                            }:null;
+                          },
+                          buttonName: "Verify",
+                          bgColor: otp.length ==6? Colors.orange:Colors.orange.shade200,
+                          fgColor: Colors.white, width: double.infinity
+                      )
+
+
                     ),
 
                     SizedBox(height: 200,)

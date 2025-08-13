@@ -5,37 +5,30 @@ import 'package:flutter/material.dart';
 import 'color_helper.dart';
 
 class UiButtonHelper{
-  CustomButtomFlex({
+  CustomButtom({
     required VoidCallback callback,
     required String buttonName,
-    double? height, double? width
-
+    required Color bgColor,
+    required Color fgColor,
+    required double? width,
   }){
-    return SizedBox(
-      height: height,
-      width: width,
-      // width: double.infinity,
-      // width: double.infinity,
-      child: ElevatedButton(onPressed: (){
-        callback();
-      },
-          style: ElevatedButton.styleFrom(
-
-              backgroundColor:ColorConstant.orange,
-              padding: EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)
-              )
-          ),
-          child: Text(
-            buttonName,
-            style: mTextStyle16(mFontWeight: FontWeight.bold,textColor: Colors.white)
-            // TextStyle(fontSize: 15,color:ColorConstant.white),
-          )),
-    );
+    return ElevatedButton(onPressed: (){
+      callback();
+    },style: ElevatedButton.styleFrom(
+      backgroundColor:bgColor,
+      foregroundColor: fgColor,
+      minimumSize: Size(width!, 45),
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),),
+        child: Text(
+          buttonName,
+          style: mTextStyle16(mFontWeight: FontWeight.bold,textColor: Colors.white)
+        ));
   }
 
-  CustomButtom({required VoidCallback callback, required String buttonName}){
+  CustomButtonFlex({required VoidCallback callback, required String buttonName}){
     return SizedBox(
       height: 45,
       width: double.infinity,
@@ -44,11 +37,12 @@ class UiButtonHelper{
         callback();
       },
           style: ElevatedButton.styleFrom(
-              backgroundColor:ColorConstant.orange,
-              padding: EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)
-              )
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
           child: Text(
             buttonName,style: TextStyle(fontSize: 16,color:ColorConstant.white),
@@ -56,3 +50,6 @@ class UiButtonHelper{
     );
   }
 }
+class HelperButtonStyle{
+
+ }

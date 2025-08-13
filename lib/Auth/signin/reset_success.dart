@@ -1,3 +1,4 @@
+import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:flutter/material.dart';
 import 'login.dart';
 
@@ -19,22 +20,12 @@ class PasswordResetSuccessScreen extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor:Colors.orange,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),),
-              child: const Text("Login"),
-            ),
+            UiButtonHelper().CustomButtonFlex(callback: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            }, buttonName: "Login"),
           ],
         ),
       ),

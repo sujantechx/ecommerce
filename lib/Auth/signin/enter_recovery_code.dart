@@ -1,4 +1,5 @@
 import 'package:ecommerce/Auth/signin/reset_passord.dart';
+import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
@@ -97,28 +98,16 @@ class _EnterRecoveryCodeScreenState extends State<EnterRecoveryCodeScreen> {
                           ],
                         )),
                     const SizedBox(height: 20),
+                    UiButtonHelper().CustomButtom(callback: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) =>  ResetPasswordScreen()),
+                      );
+                    }, buttonName: "Recovery Account",
+                        bgColor: otp.length ==6? Colors.orange:Colors.orange.shade200,
+                        fgColor: Colors.white, width: double.infinity),
 
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (_) =>  ResetPasswordScreen()),
-                            );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: otp.length ==6? Colors.orange:Colors.orange.shade200,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),),
-                        child: const Text("Recovery Account"),
-                      ),
-                    ),
                     const SizedBox(height: 100),
-
                   ],
                 ),
               ),

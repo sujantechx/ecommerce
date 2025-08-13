@@ -1,4 +1,5 @@
 import 'package:ecommerce/Auth/signin/reset_success.dart';
+import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../provider/auth_provider.dart';
@@ -53,30 +54,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     : null,
               ),
               const SizedBox(height: 20),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      authProvider.resetPassword(passwordController.text.trim());
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const PasswordResetSuccessScreen()),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),),
-                  child: const Text("Reset Password"),
-                ),
-              ),
+              UiButtonHelper().CustomButtonFlex(callback: () {
+                if (_formKey.currentState!.validate()) {
+                  authProvider.resetPassword(passwordController.text.trim());
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const PasswordResetSuccessScreen()));
+              }}, buttonName: "Reset Password")
             ],
           ),
         ),

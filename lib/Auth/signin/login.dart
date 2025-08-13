@@ -1,7 +1,10 @@
 import 'package:ecommerce/Auth/signin/recovery_method.dart';
+import 'package:ecommerce/Utils/app_routs/app_routes.dart';
+import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:ecommerce/ui_screen/home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../provider/auth_provider.dart';
 import '../../widgets/custume_login_buttons.dart';
@@ -21,6 +24,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   String? errorMessage;
+  Future<void> _loggedIn()async{
+    final prefs=await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,33 +131,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 10),
 
                       // Login Button
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            bool success = authProvider.login(
-                              emailController.text.trim(),
-                              passwordController.text.trim(),
-                            );
-                            if (success) {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const Home()),
-                              );
-                            } else {
-                              setState(() {
-                                errorMessage = "Invalid password";
-                              });
-                            }
+                      UiButtonHelper().CustomButtonFlex(callback: () {
+                        if (_formKey.currentState!.validate()) {
+                          bool success = authProvider.login(
+                            emailController.text.trim(),
+                            passwordController.text.trim(),
+                          );
+                          if (success) {
+                            Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+                          } else {
+                            setState(() {
+                              errorMessage = "Invalid password";
+                            });
                           }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                        child: const Text("Login"),
-                      ),
+                        }
+                        _loggedIn();
 
+                      }, buttonName: "Login"),
                       const SizedBox(height: 20),
                       TextButton(
                         onPressed: () {

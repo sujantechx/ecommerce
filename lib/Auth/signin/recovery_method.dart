@@ -1,5 +1,6 @@
 import 'package:ecommerce/Auth/signin/enter_recovery_code.dart';
 import 'package:ecommerce/Auth/signup/sign_up.dart';
+import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/custume_login_buttons.dart';
@@ -97,20 +98,13 @@ class _RecoveryMethodScreenState extends State<RecoveryMethodScreen> {
                       const SizedBox(height: 10),
 
 
-                      // Login Button
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => EnterRecoveryCodeScreen ()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                        child: const Text("Send Code"),
-                      ),
+                      // Recovery code
+                      UiButtonHelper().CustomButtonFlex(callback: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => EnterRecoveryCodeScreen ()),
+                        );
+                      }, buttonName: "Send Code"),
 
                       const SizedBox(height: 20),
                       TextButton(

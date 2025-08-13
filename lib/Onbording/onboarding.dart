@@ -1,5 +1,7 @@
 import 'package:ecommerce/Auth/signin/login.dart';
+import 'package:ecommerce/Utils/app_routs/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 const Color primaryGreen = Color(0xFF4CAF50); // Adjust to match your brand color
@@ -49,6 +51,11 @@ class _OnboardingState extends State<Onboarding> {
       "description": "Get real-time updates from our warehouse to your doorstep. Sit back and relax, we'll handle the rest."
     }
   ];
+Future<void>_completIntro()async{
+  final prefs=await SharedPreferences.getInstance();
+  await prefs.setBool('isFirstTime', false);
+  Navigator.pushReplacementNamed(context, AppRoutes.auth);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +83,7 @@ class _OnboardingState extends State<Onboarding> {
                     // Logo at top
                     Image.asset(
                       data['logo'],
-                      height: 50,
+                      height: 130,
                     ),
                     // Illustration
                     Padding(
@@ -144,12 +151,8 @@ class _OnboardingState extends State<Onboarding> {
                               ),
                               onPressed: () {
                                 if (_isLastPage) {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const LoginScreen()),
-                                  );
-
+                                  // Navigator.pushReplacementNamed(context, AppRoutes.auth);
+                                  _completIntro();
                                 } else {
                                   _pageController.nextPage(
                                     duration: const Duration(milliseconds: 400),

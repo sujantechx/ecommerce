@@ -1,10 +1,8 @@
 import 'dart:async';
-
-import 'package:ecommerce/Auth/auth.dart';
-import 'package:ecommerce/Auth/signin/login.dart';
-import 'package:ecommerce/Onbording/onboarding.dart';
+import 'package:ecommerce/Utils/app_routs/app_routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,19 +14,33 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    Timer(Duration(seconds:2),(){
+      _chackeStatus();
 
-    Timer(Duration(milliseconds: 3),(){
-      Navigator.push(context,
-      MaterialPageRoute(builder: (context) => Auth(),));
     });
+  }
+  Future<void>_chackeStatus()async{
+    final prefs=await SharedPreferences.getInstance();
+    bool isFirstTime=prefs.getBool('isFirstTime')??true;
+    bool isLoggedIn=prefs.getBool('isLoggedIn')??false;
+  if(isLoggedIn){
+    Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+  }
+  else if(isFirstTime){
+    Navigator.pushReplacementNamed(context, AppRoutes.intro);
+  }else{
+    Navigator.pushReplacementNamed(context, AppRoutes.auth);
+  }
+
   }
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
       body: Center(
-        child: Image(image: AssetImage('assets/logo/splass.png')),
+        child: Container(
+            height: 250,width: 250 ,
+            child: Image(image: AssetImage('assets/logo/splass.png'))),
       ),
     );
   }

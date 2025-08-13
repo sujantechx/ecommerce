@@ -1,4 +1,5 @@
 import 'package:ecommerce/Splash/splash_screen.dart';
+import 'package:ecommerce/Utils/app_routs/app_routes.dart';
 import 'package:ecommerce/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,8 +21,9 @@ class MyApp extends StatelessWidget{
     // TODO: implement build
     return MaterialApp(
       title: 'E-commerce',
-      home:SplashScreen() ,
       debugShowCheckedModeBanner: false,
+      initialRoute: AppRoutes.splash,
+      routes: AppRoutes.routes,
     );
   }
 }

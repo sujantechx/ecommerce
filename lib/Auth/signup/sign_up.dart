@@ -1,4 +1,5 @@
 import 'package:ecommerce/Auth/signup/verify.dart';
+import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../provider/auth_provider.dart';
@@ -114,29 +115,22 @@ class _SignupScreenState extends State<SignupScreen> {
                             : null,
                       ),
                       const SizedBox(height: 20),
-
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            authProvider.signup(
-                              fullNameController.text.trim(),
-                              emailController.text.trim(),
-                              phoneController.text.trim(),
-                              passwordController.text.trim(),
-                            );
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const VerifyAccountScreen()),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                        child: const Text("Sign Up"),
-                      ),
+                      UiButtonHelper().CustomButtonFlex(
+                          callback: () {
+                            if (_formKey.currentState!.validate()) {
+                              authProvider.signup(
+                                fullNameController.text.trim(),
+                                emailController.text.trim(),
+                                phoneController.text.trim(),
+                                passwordController.text.trim(),
+                              );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const VerifyAccountScreen()),
+                              );
+                            }
+                          }, buttonName: "Sign Up"),
                       // const SizedBox(height: 20),
                       const SocialLoginButtons(),
                     ],
