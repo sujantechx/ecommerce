@@ -19,8 +19,7 @@ TextStyle mTextStyle12({FontWeight mFontWeight = FontWeight
   );
 }
 
-TextStyle mTextStyle16({FontWeight mFontWeight = FontWeight
-    .w300, Color? textColor}) {
+TextStyle mTextStyle16({FontWeight mFontWeight = FontWeight.w300, Color? textColor}) {
   return TextStyle(
     fontSize: 16,
     fontWeight: mFontWeight,

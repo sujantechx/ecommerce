@@ -28,7 +28,7 @@ class _DashBordState extends State<DashBord> {
   Widget build(BuildContext context) {
     return Consumer<ProviderNav>(
         builder:(_,provider,__){
-          return      Scaffold(
+          return Scaffold(
             body: mNavPages[provider.getCurentPageIndex()],
             bottomNavigationBar: BottomNavigationBar(
                 elevation: 11,
