@@ -38,6 +38,9 @@ dependencies:
   provider: ^6.0.5
   pin_code_fields: ^8.0.1
   shared_preferences:
+  cloud_firestore: ^6.0.0
+  firebase_auth: ^6.0.1
+  firebase_core: ^4.0.0
 
 
 dev_dependencies:
