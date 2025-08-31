@@ -2,7 +2,7 @@ import 'package:ecommerce/Auth/signin/reset_success.dart';
 import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../provider/auth_provider.dart';
+import '../../services/provider/auth_provider.dart';
 import '../../widgets/custume_text_field.dart';
 
 
@@ -56,7 +56,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               const SizedBox(height: 20),
               UiButtonHelper().CustomButtonFlex(callback: () {
                 if (_formKey.currentState!.validate()) {
-                  authProvider.resetPassword(passwordController.text.trim());
+                  // authProvider.resetPassword(passwordController.text.trim());
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(

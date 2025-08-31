@@ -1,16 +1,14 @@
 import 'package:ecommerce/Auth/signin/recovery_method.dart';
 import 'package:ecommerce/Utils/app_routs/app_routes.dart';
 import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
-import 'package:ecommerce/ui_screen/home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../provider/auth_provider.dart';
+import '../../services/provider/auth_provider.dart';
 import '../../widgets/custume_login_buttons.dart';
 import '../../widgets/custume_text_field.dart';
 import '../signup/sign_up.dart';
-import '../signup/verify.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -132,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // Login Button
                       UiButtonHelper().CustomButtonFlex(callback: () {
-                        if (_formKey.currentState!.validate()) {
+                        /*if (_formKey.currentState!.validate()) {
                           bool success = authProvider.login(
                             emailController.text.trim(),
                             passwordController.text.trim(),
@@ -144,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               errorMessage = "Invalid password";
                             });
                           }
-                        }
+                        }*/
                         _loggedIn();
 
                       }, buttonName: "Login"),
