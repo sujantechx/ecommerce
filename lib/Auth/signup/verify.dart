@@ -1,7 +1,10 @@
-import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
+// lib/Auth/signup/verify.dart
+
 import 'package:flutter/material.dart';
-import 'package:ecommerce/Auth/signin/login.dart'; // Ensure you have this import
+import 'package:provider/provider.dart';
+
+import '../../Onbording/onboarding.dart';
+import '../../services/provider/auth_provider.dart';
 
 class VerifyAccountScreen extends StatefulWidget {
   const VerifyAccountScreen({super.key});
@@ -11,117 +14,82 @@ class VerifyAccountScreen extends StatefulWidget {
 }
 
 class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
-  bool isEmailVerified = false;
-  Timer? timer;
-  bool canResendEmail = false;
-
   @override
   void initState() {
     super.initState();
-    isEmailVerified = FirebaseAuth.instance.currentUser?.emailVerified ?? false;
-
-    if (!isEmailVerified) {
-      timer = Timer.periodic(const Duration(seconds: 3), (_) => checkEmailVerified());
-      Future.delayed(const Duration(seconds: 30), () {
-        if (mounted) setState(() => canResendEmail = true);
-      });
-    }
+    // Start the verification check when the screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AuthProvider>(context, listen: false).startVerificationTimer();
+    });
   }
 
   @override
   void dispose() {
-    timer?.cancel();
+    // IMPORTANT: Stop the timer when the screen is closed to prevent memory leaks
+    Provider.of<AuthProvider>(context, listen: false).cancelVerificationTimer();
     super.dispose();
-  }
-
-  Future<void> checkEmailVerified() async {
-    await FirebaseAuth.instance.currentUser?.reload();
-    setState(() {
-      isEmailVerified = FirebaseAuth.instance.currentUser?.emailVerified ?? false;
-    });
-
-    if (isEmailVerified && mounted) {
-      timer?.cancel();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email successfully verified!"), backgroundColor: Colors.green),
-      );
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-            (route) => false,
-      );
-    }
-  }
-
-  Future<void> resendVerificationEmail() async {
-    try {
-      await FirebaseAuth.instance.currentUser?.sendEmailVerification();
-      setState(() => canResendEmail = false);
-      Future.delayed(const Duration(seconds: 30), () {
-        if (mounted) setState(() => canResendEmail = true);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Verification email resent."), backgroundColor: Colors.blue),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}"), backgroundColor: Colors.red),
-      );
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/bg.png"),
-                fit: BoxFit.cover,
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        // This is the magic! When the email is verified, navigate to the Home Screen.
+        // This is a much better user experience than going back to the login page.
+        if (authProvider.isEmailVerified) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Email successfully verified!"), backgroundColor: Colors.green),
+            );
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()), // GO TO HOME!
+                  (route) => false,
+            );
+          });
+        }
+
+        return Scaffold(
+          body: Stack(
+            // ... (Your background decoration remains the same)
+            children: [
+              // Your background container...
+              Center(
+                child: Container(
+                  // ... (Your container styling remains the same)
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text("Verify Your Email", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 16),
+                      Text(
+                        "A verification link has been sent to:\n${authProvider.user?.email ?? 'your email'}",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 24),
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      const Text("Waiting for you to click the link...", textAlign: TextAlign.center),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.email),
+                        label: const Text("Resend Email"),
+                        // Button is enabled/disabled based on provider state
+                        onPressed: authProvider.canResendEmail
+                            ? () => authProvider.resendVerificationEmail()
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: authProvider.canResendEmail ? Colors.orange : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    "Verify Your Email",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "A verification link has been sent to:\n${FirebaseAuth.instance.currentUser?.email}",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 24),
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
-                  const Text("Waiting for you to click the link...", textAlign: TextAlign.center),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.email),
-                    label: const Text("Resend Email"),
-                    onPressed: canResendEmail ? resendVerificationEmail : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: canResendEmail ? Colors.orange : Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

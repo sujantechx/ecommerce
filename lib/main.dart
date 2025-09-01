@@ -1,44 +1,54 @@
-import 'package:ecommerce/Utils/app_routs/app_routes.dart';
+// lib/main.dart
+
+import 'package:ecommerce/services/firebase/auth_wrapper.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+
+// 1. Import the generated file
+import 'firebase_options.dart';
+
+// ... your other imports (AuthService, FirestoreService, etc.)
 import 'package:ecommerce/services/firebase/auth_service.dart';
 import 'package:ecommerce/services/firebase/firestore_service.dart';
 import 'package:ecommerce/services/provider/auth_provider.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 
-Future<void> main() async{
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp (
+
+  // 2. Use the 'options' parameter from the generated file
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  runApp(
     MultiProvider(
       providers: [
-        // Provide a single instance of your services
         Provider<AuthService>(create: (_) => AuthService()),
         Provider<FirestoreService>(create: (_) => FirestoreService()),
-
-        // Create the AuthProvider which depends on the services above
-        ChangeNotifierProxyProvider2<AuthService, FirestoreService, AuthProvider>(
+        ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(
-            authService: Provider.of<AuthService>(context, listen: false),
-            firestoreService: Provider.of<FirestoreService>(context, listen: false),
+            authService: context.read<AuthService>(),
+            firestoreService: context.read<FirestoreService>(),
           ),
-          update: (_, authService, firestoreService, authProvider) =>
-          authProvider!..updateDependencies(authService, firestoreService),
-        ),      ],
-      child:  MyApp(),
+        ),
+      ],
+      child: const MyApp(),
     ),
   );
 }
-class MyApp extends StatelessWidget{
+
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return MaterialApp(
+    return const MaterialApp(
       title: 'E-commerce',
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.splash,
-      routes: AppRoutes.routes,
+      home: AuthWrapper(),
     );
   }
 }

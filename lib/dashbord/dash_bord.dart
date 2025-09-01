@@ -22,7 +22,7 @@ class _DashBordState extends State<DashBord> {
     Favourite(),
     Home(),
     Catlog(),
-    Profile(),
+    ProfileScreen(),
   ];
   @override
   Widget build(BuildContext context) {

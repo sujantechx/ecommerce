@@ -36,7 +36,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-    bool success = await authProvider.signup(
+    bool success = await authProvider.signUp(
       fullName: fullNameController.text.trim(),
       email: emailController.text.trim(),
       phone: phoneController.text.trim(),
@@ -51,7 +51,7 @@ class _SignupScreenState extends State<SignupScreen> {
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(authProvider.errorMessage),
+          content: Text(authProvider.errorMessage??"An unknown error occurred."),
           backgroundColor: Colors.red,
         ),
       );
