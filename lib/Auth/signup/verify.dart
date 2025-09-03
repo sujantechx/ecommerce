@@ -1,5 +1,6 @@
 // lib/Auth/signup/verify.dart
 
+import 'package:ecommerce/ui_screen/home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,7 +43,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
               const SnackBar(content: Text("Email successfully verified!"), backgroundColor: Colors.green),
             );
             Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const HomeScreen()), // GO TO HOME!
+              MaterialPageRoute(builder: (context) => Home()), // GO TO HOME!
                   (route) => false,
             );
           });
