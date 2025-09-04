@@ -7,7 +7,7 @@ import 'package:ecommerce/dashbord/provider/provider_nav.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
-import '../../dashbord/dash_bord.dart';
+import '../dashbord/dash_bord.dart';
 
 class AppRoutes{
   static const String splash = "/";
