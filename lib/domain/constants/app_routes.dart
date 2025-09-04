@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
 import '../../dashbord/dash_bord.dart';
+import '../../ui_screen/product_details.dart';
 
 
 class AppRoutes{
@@ -17,7 +18,7 @@ class AppRoutes{
   static const String dashboard = "/dashboard";
   static const String intro = "/intro";
   static const String auth = "/auth";
-  static const String add = "/addExp";
+  static const String productDetails = "/product";
 
   static Map<String, Widget Function(BuildContext)> routes = {
     splash: (_) => SplashScreen(),
@@ -25,6 +26,7 @@ class AppRoutes{
     auth: (_) => Auth(),
     login: (_) => LoginScreen(),
     signUp: (_) => SignupScreen(),
+    productDetails: (_) => ProductDetails(),
     dashboard: (_) => ChangeNotifierProvider(
       create: (context) => ProviderNav(),
       child: DashBord(),),

@@ -1,14 +1,13 @@
+import 'package:ecommerce/domain/constants/app_routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-// --- 1. DATA MODELING ---
-// Create simple classes to hold your data for type safety.
+// Create simple classes to hold data model
 
 class Category {
   final String name;
   final String icon;
-
   const Category({required this.name, required this.icon});
 }
 
@@ -16,7 +15,7 @@ class Product {
   final String name;
   final double price;
   final String imageUrl;
-  bool isFavorite; // Added to make the favorite button interactive
+  bool isFavorite;
 
   Product({
     required this.name,
@@ -31,8 +30,6 @@ class Offer {
   const Offer({required this.imageUrl});
 }
 
-// --- REFACTORED HOME WIDGET ---
-
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -43,7 +40,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final PageController _pageController = PageController();
 
-  // --- Data is now strongly typed using the models ---
+  //  Data using the models
   final List<Offer> _offers = const [
     Offer(imageUrl:
     "https://static.vecteezy.com/system/resources/previews/008/601/839/non_2x/online-shopping-background-design-free-vector.jpg"
@@ -80,13 +77,11 @@ class _HomeState extends State<Home> {
         actions: [IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.bell))],
       ),
       body: SingleChildScrollView(
-        // Using SingleChildScrollView is often simpler than ListView for static layouts
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- 2. CODE ORGANIZATION ---
-            // Each part of the UI is now a separate, readable method.
+            // Each part of the UI is now a separate
             _buildSearchBar(),
             const SizedBox(height: 24),
             _buildOfferCarousel(),
@@ -118,7 +113,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  /// Builds the horizontally scrolling offer banner carousel.
+  /// Builds the horizontally scrolling offer banner
   Widget _buildOfferCarousel() {
     return SizedBox(
       height: 180,
@@ -219,7 +214,11 @@ class _HomeState extends State<Home> {
       itemCount: _products.length,
       itemBuilder: (context, index) {
         final product = _products[index];
-        return _buildProductCard(product); // Use a helper for the card UI
+        return InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, AppRoutes.productDetails);
+          },
+            child: _buildProductCard(product)); // Use a helper for the card UI
       },
     );
   }
@@ -265,7 +264,6 @@ class _HomeState extends State<Home> {
               const SizedBox(height: 8),
             ],
           ),
-          // --- 4. UI POLISH ---
           // The favorite button is now interactive.
           Positioned(
             right: 0,
