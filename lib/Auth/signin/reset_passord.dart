@@ -1,8 +1,7 @@
 import 'package:ecommerce/Auth/signin/reset_success.dart';
-import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../services/provider/auth_provider.dart';
+import '../../domain/Utils/ui_helper/button_helper.dart';
 import '../../widgets/custume_text_field.dart';
 
 
@@ -20,7 +19,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     return Scaffold(
       body: Padding(

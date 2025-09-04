@@ -1,8 +1,9 @@
 import 'package:ecommerce/Auth/signin/login.dart';
-import 'package:ecommerce/Utils/app_routs/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import '../domain/constants/app_routes.dart';
 
 const Color primaryGreen = Color(0xFF4CAF50); // Adjust to match your brand color
 const Color titleColor = Color(0xFF0A2940); // Dark blue title
@@ -52,8 +53,8 @@ class _OnboardingState extends State<Onboarding> {
     }
   ];
 Future<void>_completIntro()async{
-  final prefs=await SharedPreferences.getInstance();
-  await prefs.setBool('isFirstTime', false);
+  // final prefs=await SharedPreferences.getInstance();
+  // await prefs.setBool('isFirstTime', false);
   Navigator.pushReplacementNamed(context, AppRoutes.auth);
 }
 

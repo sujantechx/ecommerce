@@ -1,9 +1,9 @@
 import 'package:ecommerce/Auth/signin/login.dart';
 import 'package:ecommerce/Auth/signup/sign_up.dart';
-import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../domain/Utils/ui_helper/button_helper.dart';
 import '../widgets/custume_login_buttons.dart';
 
 class Auth extends StatefulWidget {

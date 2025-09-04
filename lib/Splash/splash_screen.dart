@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'package:ecommerce/Utils/app_routs/app_routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../domain/constants/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,10 +17,11 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(Duration(seconds:2),(){
-      _chackeStatus();
-
+      // _chackeStatus();
+      Navigator.pushReplacementNamed(context, AppRoutes.intro);
     });
   }
+  /*
   Future<void>_chackeStatus()async{
     final prefs=await SharedPreferences.getInstance();
     bool isFirstTime=prefs.getBool('isFirstTime')??true;
@@ -34,6 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   }
+  */
   @override
   Widget build(BuildContext context) {
     return  Scaffold(

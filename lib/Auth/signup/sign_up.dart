@@ -1,7 +1,6 @@
-import 'package:ecommerce/Auth/signup/verify.dart';
+import 'package:ecommerce/domain/constants/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../services/provider/auth_provider.dart';
 import '../../widgets/custume_login_buttons.dart';
 
 
@@ -30,33 +29,6 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  Future<void> _handleSignUp() async {
-    FocusScope.of(context).unfocus();
-    if (!_formKey.currentState!.validate()) return;
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    bool success = await authProvider.signUp(
-      fullName: fullNameController.text.trim(),
-      email: emailController.text.trim(),
-      phone: phoneController.text.trim(),
-      password: passwordController.text.trim(),
-    );
-
-    if (mounted && success) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const VerifyAccountScreen()),
-      );
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(authProvider.errorMessage??"An unknown error occurred."),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,18 +117,14 @@ class _SignupScreenState extends State<SignupScreen> {
                         validator: (v) => v != passwordController.text ? "Passwords do not match" : null,
                       ),
                       const SizedBox(height: 20),
-                      Consumer<AuthProvider>(
-                        builder: (context, provider, child) {
-                          return provider.isLoading
-                              ? const Center(child: CircularProgressIndicator())
-                              : SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _handleSignUp,
-                              child: const Text("Sign Up"),
-                            ),
-                          );
-                        },
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+                          },
+                          child: const Text("Sign Up"),
+                        ),
                       ),
                       const SocialLoginButtons()
                     ],

@@ -1,10 +1,10 @@
 import 'package:ecommerce/Auth/signin/recovery_method.dart';
-import 'package:ecommerce/Utils/ui_helper/button_helper.dart';
+import 'package:ecommerce/domain/constants/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/provider/auth_provider.dart';
+import '../../domain/Utils/ui_helper/button_helper.dart';
 import '../../widgets/custume_login_buttons.dart';
 import '../../widgets/custume_text_field.dart';
 import '../signup/sign_up.dart';
@@ -21,15 +21,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   String? errorMessage;
-  Future<void> _loggedIn()async{
+ /* Future<void> _loggedIn()async{
     final prefs=await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', true);
 
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -142,7 +141,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             });
                           }
                         }*/
-                        _loggedIn();
+                        // _loggedIn()
+                        Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
 
                       }, buttonName: "Login"),
                       const SizedBox(height: 20),

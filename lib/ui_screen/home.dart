@@ -1,252 +1,296 @@
-import 'package:ecommerce/Utils/ui_helper/text_style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+// --- 1. DATA MODELING ---
+// Create simple classes to hold your data for type safety.
+
+class Category {
+  final String name;
+  final String icon;
+
+  const Category({required this.name, required this.icon});
+}
+
+class Product {
+  final String name;
+  final double price;
+  final String imageUrl;
+  bool isFavorite; // Added to make the favorite button interactive
+
+  Product({
+    required this.name,
+    required this.price,
+    required this.imageUrl,
+    this.isFavorite = false,
+  });
+}
+
+class Offer {
+  final String imageUrl;
+  const Offer({required this.imageUrl});
+}
+
+// --- REFACTORED HOME WIDGET ---
 
 class Home extends StatefulWidget {
-  Home({super.key});
+  const Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  // Dummy category data
-  final List<Map<String, String>> categories = [
-    {"name": "Shoes", "icon": "👟"},
-    {"name": "Beauty", "icon": "💄"},
-    {"name": "Women's Fashion", "icon": "👗"},
-    {"name": "Jewelry", "icon": "💍"},
-    {"name": "Men's Fashion", "icon": "👕"},
+  final PageController _pageController = PageController();
+
+  // --- Data is now strongly typed using the models ---
+  final List<Offer> _offers = const [
+    Offer(imageUrl:
+    "https://static.vecteezy.com/system/resources/previews/008/601/839/non_2x/online-shopping-background-design-free-vector.jpg"
+    ),
+    Offer(imageUrl:
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBcBC225zFGTXbsgZ_x8I0iy-4jjw0jC9q2g&s"
+    ),
+
   ];
 
-  // Dummy product data
-  final List<Map<String, dynamic>> products = [
-    {
-      "name": "Wireless Headphones",
-      "price": 120.00,
-      "image":
-      "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSmSKPs0qy5lrDwccWHM_4GF7BHQYeZtWfurBUic_AkkL8TY3WeNAGxQQ5N_LvXoItkF-tR_Iepsg3ZM62LWxZkPjHnVoTkctVZIGMolehkN8klTpFzb2vi"
-    },
-    {
-      "name": "Woman Sweater",
-      "price": 70.00,
-      "image":
-      "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRHGlhWeFHkX5kxBJfOxVkLMnI4rB2Zu5zAGlKwq2N3kdtTHbxuUjI_Db6Ht3-1WB0zRe_ZJdp-Ytx128mysTq5mFoDDzqkEbD5a8KQP90"
-    },
-    {
-      "name": "Smart Watch",
-      "price": 55.00,
-      "image":
-      "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQPErNUPqTOzNZMNP97DMEHM8VU3sAqyME3cTEh82JOZoK5CZGM0igotRQw8hL7FcxURLBBLLstQTksx69WQ-InsdH0zkFF2uaZQoo2er_-NGRMBAka5YKJax424j4X3ux99UvAVX02fw&usqp=CAc"
-    },
-    {
-      "name": "Sneakers",
-      "price": 90.00,
-      "image":
-      "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQfm_WoUvZcBjCy29nhw6JRuErl6goRmVgnDMUQzd6ykiWieeSoB782bPg__-4QFawnmcxG8ucCYk8lClinHpX2YrlZ5Rol7MkHgjH_F0a69YijnOqaO2G1FYc"
-    },
+  final List<Category> _categories = const [
+    Category(name: "Shoes", icon: "👟"),
+    Category(name: "Beauty", icon: "💄"),
+    Category(name: "Women's Fashion", icon: "👗"),
+    Category(name: "Jewelry", icon: "💍"),
+    Category(name: "Men's Fashion", icon: "👕"),
   ];
-/// dummy offer banner
-  final PageController _pageController=PageController();
- final  List<Map<String,dynamic>>offer=[
-   {
-     "img":
-"https://img.pikbest.com/templates/20240817/sale-offer-post-design-template-creative-product-instagram_10734409.jpg!bw700"   }, {
-     "img":
-     "https://static.vecteezy.com/system/resources/thumbnails/001/381/216/small_2x/special-offer-sale-banner-with-megaphone-free-vector.jpg"
-   }, {
-     "img":
-         "https://c8.alamy.com/comp/2BWGH1Y/hot-sale-special-offer-banner-2BWGH1Y.jpg"
-   }, {
-     "img":
-         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdAZNKzi21Wrn4xTYP5HueGoaz0ctH9mGysA&s"
-   }, {
-     "img":
-         "https://img.freepik.com/premium-vector/product-sale-promotion-print-flyer-poster-template-design_612040-1824.jpg"
-   },
- ];
+
+  // Using a List instead of final to allow `isFavorite` to be changed
+  final List<Product> _products = [
+    Product(name: "Wireless Headphones", price: 120.00, imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"),
+    Product(name: "Woman Sweater", price: 70.00, imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaUW_iC9HrJ1wzvx4kgNYlewfmafMAiyZuKWUajIGDYpWxYgAcAhbVn9FqJwBjrV9-bmo&usqp=CAU"),
+    Product(name: "Smart Watch", price: 55.00, imageUrl: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&q=80"),
+    Product(name: "Sneakers", price: 90.00, imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80"),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Home"),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black,
+        leading: IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.square_grid_2x2)),
+        title: const Text("E-Commerce"),
+        centerTitle: true,
+        actions: [IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.bell))],
       ),
-      body: ListView(
+      body: SingleChildScrollView(
+        // Using SingleChildScrollView is often simpler than ListView for static layouts
         padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // --- 2. CODE ORGANIZATION ---
+            // Each part of the UI is now a separate, readable method.
+            _buildSearchBar(),
+            const SizedBox(height: 24),
+            _buildOfferCarousel(),
+            const SizedBox(height: 24),
+            _buildCategoryList(),
+            const SizedBox(height: 24),
+            _buildSectionHeader("Special For You", "See all"),
+            const SizedBox(height: 12),
+            _buildProductGrid(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds the search bar widget.
+  Widget _buildSearchBar() {
+    return TextField(
+      decoration: InputDecoration(
+        hintText: "Search...",
+        prefixIcon: const Icon(CupertinoIcons.search),
+        filled: true,
+        fillColor: Colors.grey.shade200,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+
+  /// Builds the horizontally scrolling offer banner carousel.
+  Widget _buildOfferCarousel() {
+    return SizedBox(
+      height: 180,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
         children: [
-          // Search Bar
-          TextField(
-            decoration: InputDecoration(
-              hintText: "Search...",
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Banner
-          Container(
-            height: 150,
-            decoration: BoxDecoration(
-              color: Colors.orange.shade100,
-              borderRadius: BorderRadius.circular(22),
-             
-            ),child: PageView.builder(
+          PageView.builder(
             controller: _pageController,
-            itemCount: offer.length,
-            itemBuilder: (BuildContext context, int index) { 
-              final offImg=offer[index];
-              return Stack(
-                children: [
-                  Positioned(
-                    left: 0,right: 0,top: 0,bottom: 0,child:
-                  Image.network(
-                    offImg['img'],
-                    fit: BoxFit.fill,
-                  ),
-                  ),
-
-                  Positioned(
-                    bottom: 10,left: 150,right: 150,
-                    child: SmoothPageIndicator(
-                      count: offer.length,
-                      effect: const WormEffect(
-                        dotColor: Colors.grey,
-                        activeDotColor: Colors.green,
-                        dotHeight: 10,
-                        dotWidth: 10,
-                        spacing: 12,
-                      ), controller:_pageController,
-                    ),
-                  ),
-                ],
+            itemCount: _offers.length,
+            itemBuilder: (context, index) {
+              final offer = _offers[index];
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Image.network(
+                  offer.imageUrl,
+                  fit: BoxFit.cover,
+                ),
               );
             },
-            
           ),
-          ),
-          const SizedBox(height: 16),
 
-          // Categories List
-          SizedBox(
-            height: 90,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                return Container(
-                  width: 80,
-                  margin: const EdgeInsets.only(right: 12),
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.orange.shade100,
-                        child: Text(
-                          categories[index]['icon']!,
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        categories[index]['name']!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                );
-              },
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: SmoothPageIndicator(
+              controller: _pageController,
+              count: _offers.length,
+              effect: WormEffect(
+                dotColor: Colors.grey.shade400,
+                activeDotColor: Colors.white,
+                dotHeight: 8,
+                dotWidth: 8,
+                spacing: 10,
+              ),
             ),
           ),
-          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
 
-          // Special For You Grid
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  /// Builds the horizontally scrolling category list.
+  Widget _buildCategoryList() {
+    return SizedBox(
+      height: 90,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _categories.length,
+        itemBuilder: (context, index) {
+          final category = _categories[index];
+          return Container(
+            width: 80,
+            margin: const EdgeInsets.only(right: 8),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.orange.shade100,
+                  child: Text(category.icon, style: const TextStyle(fontSize: 24)),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  category.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Builds a reusable section header with a title and an action text.
+  Widget _buildSectionHeader(String title, String actionText) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(actionText, style: TextStyle(color: Colors.grey.shade600)),
+      ],
+    );
+  }
+
+  /// Builds the grid of product cards.
+  Widget _buildProductGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+      ),
+      itemCount: _products.length,
+      itemBuilder: (context, index) {
+        final product = _products[index];
+        return _buildProductCard(product); // Use a helper for the card UI
+      },
+    );
+  }
+
+  /// Builds a single product card.
+  Widget _buildProductCard(Product product) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Text(
-                "Special For You",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  child: Image.network(
+                    product.imageUrl,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-               Text(
-                "See all",
-                style: mTextStyle12(textColor:Colors.black54 ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  product.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  "\$${product.price.toStringAsFixed(2)}",
+                  style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 8),
             ],
           ),
-          const SizedBox(height: 12),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // 2 items in a row
-              childAspectRatio: 0.75,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+          // --- 4. UI POLISH ---
+          // The favorite button is now interactive.
+          Positioned(
+            right: 0,
+            top: 0,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(12),
+                  bottomLeft: Radius.circular(8),
+                ),
+              ),
+              child: IconButton(
+                onPressed: () {
+                  setState(() {
+                    product.isFavorite = !product.isFavorite;
+                  });
+                },
+                icon: Icon(
+                  product.isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
             ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              return Stack(
-                children: [
-                  Positioned(
-                      // right: 10,top: 5,
-                      child:                   Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-              ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(12),
-              ),
-              child: Image.network(
-              products[index]['image'],
-              height: 160,
-              width: double.infinity,
-              fit: BoxFit.fill,
-              ),
-              ),
-              Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-              products[index]['name'],
-              style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              ),
-              Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-              "\$${products[index]['price']}",
-              style: const TextStyle(color: Colors.orange),
-              ),
-              ),
-              ],
-              ),
-              ),
-              ),
-                  Positioned(
-                      right: 0,top: 0,child: Container(height: 40,width: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(topRight: Radius.circular(15),bottomLeft: Radius.circular(8)),
-                        color: Colors.orange
-                    ),child: Icon(Icons.favorite_border,size: 40,color: Colors.white,),
-                  )),
-                ],
-              );
-            },
           ),
         ],
       ),

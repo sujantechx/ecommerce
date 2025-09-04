@@ -1,4 +1,4 @@
- import 'package:ecommerce/Utils/ui_helper/text_style.dart';
+import 'package:ecommerce/domain/Utils/ui_helper/text_style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
