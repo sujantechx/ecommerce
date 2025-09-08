@@ -1,6 +1,10 @@
 import 'package:ecommerce/domain/constants/app_routes.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
+import '../../bloc/user/user_bloc.dart';
+import '../../bloc/user/user_event.dart';
+import '../../bloc/user/user_state.dart';
 import '../../widgets/custume_login_buttons.dart';
 
 
@@ -18,6 +22,8 @@ class _SignupScreenState extends State<SignupScreen> {
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  bool isLoading = false;
+
 
   @override
   void dispose() {
@@ -119,11 +125,65 @@ class _SignupScreenState extends State<SignupScreen> {
                       const SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
+                        child: BlocConsumer<UserBloc, UserState>(
+                          listener: (_, state) {
+                            if (state is UserLoadingState) {
+                              isLoading = true;
+                            }
+
+                            if (state is UserFailureState) {
+                              isLoading = false;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(state.errorMsg), backgroundColor: Colors.red,),
+                              );
+                            }
+
+                            if (state is UserSuccessState) {
+                              isLoading = false;
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("User Registered successfully!!"), backgroundColor: Colors.green,),
+                              );
+                            }
                           },
-                          child: const Text("Sign Up"),
+                          builder: (_, state) {
+                            return ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () {
+                                if(_formKey.currentState!.validate()){
+                                  String name = fullNameController.text;
+                                  String email = emailController.text;
+                                  String mobNo = phoneController.text;
+                                  String pass = passwordController.text;
+
+                                  context.read<UserBloc>().add(
+                                    RegisterUserEvent(
+                                      name: name,
+                                      email: email,
+                                      mobNo: mobNo,
+                                      pass: pass,
+                                    ),
+                                  );
+                                }
+                              },
+                              child: isLoading ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                    child: CircularProgressIndicator( color: Colors.white,),
+                                  ),
+                                  SizedBox(
+                                    width: 11,
+                                  ),
+                                  Text("Registering..")
+                                ],
+                              ) : Text('Register'),
+                            );
+                          },
                         ),
                       ),
                       const SocialLoginButtons()
