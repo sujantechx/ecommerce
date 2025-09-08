@@ -1,10 +1,20 @@
+import 'package:ecommerce/bloc/user/user_bloc.dart';
+import 'package:ecommerce/data/remote/helper/api_helper.dart';
+import 'package:ecommerce/data/remote/repository/user_repo.dart';
 import 'package:ecommerce/domain/constants/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
 
 void main()  {
-  runApp( MyApp(),
-  );
+  runApp(MultiProvider(providers: [
+    BlocProvider(create: (context) => UserBloc(
+        userRepository: UserRepository(
+            apiHelper: ApiHelper())),),
+
+  ],child:  MyApp(),));
+
 }
 
 class MyApp extends StatelessWidget {

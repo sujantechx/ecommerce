@@ -28,7 +28,7 @@ class UiButtonHelper{
         ));
   }
 
-  CustomButtonFlex({required VoidCallback callback, required String buttonName}){
+  CustomButtonFlex({required VoidCallback callback, required String buttonName,}){
     return SizedBox(
       height: 45,
       width: double.infinity,
@@ -48,6 +48,7 @@ class UiButtonHelper{
             buttonName,style: TextStyle(fontSize: 16,color:ColorConstant.white),
           )),
     );
+
   }
 }
 class HelperButtonStyle{

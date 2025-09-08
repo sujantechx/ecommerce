@@ -45,6 +45,7 @@ class _DashBordState extends State<DashBord> {
                   provider.updatePageIndex(index: index);
                 },
 
+
                 items: [
                   BottomNavigationBarItem(activeIcon: Icon(Icons.category_outlined),label: "Category",icon: Icon(Icons.category),),
                   BottomNavigationBarItem(activeIcon: Icon(Icons.favorite_border_outlined),label: "Favorite",icon: Icon(Icons.favorite_border),),

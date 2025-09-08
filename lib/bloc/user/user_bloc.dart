@@ -13,7 +13,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
     on<RegisterUserEvent>((event, emit) async{
       emit(UserLoadingState());
-
       try {
         dynamic res = await userRepository.registerUser(
           email: event.email,
@@ -21,17 +20,30 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           mobNo: event.mobNo,
           pass: event.pass,
         );
-
         if(res["status"]){
           emit(UserSuccessState());
         } else {
           emit(UserFailureState(errorMsg: res["message"]));
         }
-
       } catch (e) {
         emit(UserFailureState(errorMsg: e.toString()));
       }
     });
-    on<LoginUserEvent>((event, emit) {});
+    // In your UserBloc class
+
+    on<LoginUserEvent>((event, emit) async {
+      emit(UserLoadingState());
+      try {
+        dynamic login = await userRepository.loginUser(email: event.email, pass: event.pass);
+
+        if (login["status"] == true) { // Also, be explicit with '== true' for clarity
+          emit(UserSuccessState());
+        } else { // <-- CORRECTED LINE
+          emit(UserFailureState(errorMsg: login["message"] ?? "Invalid credentials"));
+        }
+      } catch(e) {
+        emit(UserFailureState(errorMsg: e.toString()));
+      }
+    });
   }
 }

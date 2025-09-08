@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart'as http;
@@ -11,24 +12,23 @@ class ApiHelper {
     Map<String,String>? mHeader,
     Map<String,dynamic>? mBody
 })async{
-    try{
-          var response = await http.post(Uri.parse(url),
+    try {
+      var response = await http.post(
+          Uri.parse(url),
+          body: mBody != null ? jsonEncode(mBody) : null,
+          headers: mHeader
+      ).timeout(const Duration(seconds: 15)); // <-- ADD THIS LINE
 
-          body:mBody !=null ? jsonEncode(mBody):null,headers: mHeader);
-          return parsedResponse(response);
+      return parsedResponse(response);
 
-    }on SocketException catch(e){
-      throw NoInternetException(desc: "Not connected to network, ${e.message}");
-    }catch(e){
-      rethrow;
+    } on TimeoutException {
+      // Now this will be caught if the request takes too long
+      throw FetchDataException(desc: "The connection timed out. Please check your internet and try again.");
+    } on SocketException {
+      throw NoInternetException(desc: "No Internet Connection.");
     }
   }
   dynamic parsedResponse(http.Response res){
-    /*if(res.statusCode==200){
-
-    } else if(res.statusCode==300){
-
-    }*/
 
     switch(res.statusCode){
 

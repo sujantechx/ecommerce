@@ -1,6 +1,5 @@
 import 'package:ecommerce/Auth/signin/reset_success.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../domain/Utils/ui_helper/button_helper.dart';
 import '../../widgets/custume_text_field.dart';
 

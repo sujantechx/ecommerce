@@ -1,7 +1,6 @@
 import 'package:ecommerce/domain/constants/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart';
 import '../../bloc/user/user_bloc.dart';
 import '../../bloc/user/user_event.dart';
 import '../../bloc/user/user_state.dart';
@@ -144,6 +143,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text("User Registered successfully!!"), backgroundColor: Colors.green,),
                               );
+                              Navigator.pushReplacementNamed(context, AppRoutes.login);
+
                             }
                           },
                           builder: (_, state) {

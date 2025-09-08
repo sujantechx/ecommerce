@@ -17,11 +17,10 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(Duration(seconds:2),(){
-      // _chackeStatus();
+      _chackeStatus();
       Navigator.pushReplacementNamed(context, AppRoutes.intro);
     });
   }
-  /*
   Future<void>_chackeStatus()async{
     final prefs=await SharedPreferences.getInstance();
     bool isFirstTime=prefs.getBool('isFirstTime')??true;
@@ -36,7 +35,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   }
-  */
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
