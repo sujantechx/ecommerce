@@ -1,17 +1,51 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart'as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_exception.dart';
 class ApiHelper {
-  getAPI(){}
+
+    Future<dynamic> getApi({
+      required String url,
+      Map<String,String>? mHeaders,
+      bool isAuth=false,
+
+    })async{
+      if(!isAuth){
+        mHeaders ??={};
+
+        SharedPreferences prefs=await SharedPreferences.getInstance();
+        String token=prefs.getString("token")??"";
+        mHeaders["Authorization"]="Bearer$token";
+      }
+      try{
+        var response=await http.get(
+          Uri.parse(url),
+          headers: mHeaders,
+        );
+        print("res:${response.body}");
+        return parsedResponse(response);
+      }on SocketException catch(e){
+        throw NoInternetException(desc: "Not connected to network,${e.message}");
+
+      }catch (e){
+        rethrow;
+      }
+    }
   postAPI(
   {
     required String url,
     Map<String,String>? mHeader,
-    Map<String,dynamic>? mBody
+    Map<String,dynamic>? mBody,
+    bool isAuth=false
 })async{
+    if(!isAuth){
+      mHeader??={};
+
+    }
     try {
       var response = await http.post(
           Uri.parse(url),

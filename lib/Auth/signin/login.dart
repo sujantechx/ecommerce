@@ -155,34 +155,38 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         // The builder's only job is to build the UI based on the current state.
                         builder: (context, state) {
-                          return ElevatedButton(
-                            onPressed: () {
-                              // Don't do anything if the state is already loading
-                              if (state is UserLoadingState) return;
+                          return SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
 
-                              if (_formKey.currentState!.validate()) {
-                                String email = emailController.text;
-                                String pass = passwordController.text;
-                                context.read<UserBloc>().add(
-                                  LoginUserEvent(email: email, pass: pass),
-                                );
-                              }
-                            },
-                            // The child of the button is now determined directly by the state.
-                            // This is the correct way to use the builder.
-                            child: (state is UserLoadingState)
-                                ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 5.0),
-                                  child: CircularProgressIndicator(color: Colors.white),
-                                ),
-                                SizedBox(width: 11),
-                                Text("Logging in..."),
-                              ],
-                            )
-                                : Text("Login"), // Show "Login" for all other states
+                              onPressed: () {
+                                // Don't do anything if the state is already loading
+                                if (state is UserLoadingState) return;
+
+                                if (_formKey.currentState!.validate()) {
+                                  String email = emailController.text;
+                                  String pass = passwordController.text;
+                                  context.read<UserBloc>().add(
+                                    LoginUserEvent(email: email, pass: pass),
+                                  );
+                                }
+                              },
+                              // The child of the button is now determined directly by the state.
+                              // This is the correct way to use the builder.
+                              child: (state is UserLoadingState)
+                                  ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                    child: CircularProgressIndicator(color: Colors.white),
+                                  ),
+                                  SizedBox(width: 11),
+                                  Text("Logging in..."),
+                                ],
+                              )
+                                  : Text("Login"), // Show "Login" for all other states
+                            ),
                           );
                         },
                       ),

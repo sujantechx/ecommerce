@@ -3,6 +3,7 @@
 import 'package:ecommerce/bloc/user/user_event.dart';
 import 'package:ecommerce/bloc/user/user_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/remote/repository/user_repo.dart';
 
@@ -31,19 +32,25 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     });
     // In your UserBloc class
 
-    on<LoginUserEvent>((event, emit) async {
+    on<LoginUserEvent>((event, emit) async{
       emit(UserLoadingState());
-      try {
-        dynamic login = await userRepository.loginUser(email: event.email, pass: event.pass);
 
-        if (login["status"] == true) { // Also, be explicit with '== true' for clarity
+      try{
+
+        dynamic res = await userRepository.loginUser(email: event.email, pass: event.pass);
+        if(res["status"]){
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString("token", res["tokan"]);
+
           emit(UserSuccessState());
-        } else { // <-- CORRECTED LINE
-          emit(UserFailureState(errorMsg: login["message"] ?? "Invalid credentials"));
+        } else {
+          emit(UserFailureState(errorMsg: res["message"]));
         }
-      } catch(e) {
+
+
+      } catch(e){
         emit(UserFailureState(errorMsg: e.toString()));
       }
-    });
-  }
+
+    });  }
 }

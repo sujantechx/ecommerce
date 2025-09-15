@@ -122,71 +122,71 @@ class _SignupScreenState extends State<SignupScreen> {
                         validator: (v) => v != passwordController.text ? "Passwords do not match" : null,
                       ),
                       const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: BlocConsumer<UserBloc, UserState>(
-                          listener: (_, state) {
-                            if (state is UserLoadingState) {
-                              isLoading = true;
-                            }
+                        SizedBox(
+                          width: double.infinity,
+                          child: BlocConsumer<UserBloc, UserState>(
+                            listener: (_, state) {
+                              if (state is UserLoadingState) {
+                                isLoading = true;
+                              }
 
-                            if (state is UserFailureState) {
-                              isLoading = false;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(state.errorMsg), backgroundColor: Colors.red,),
-                              );
-                            }
+                              if (state is UserFailureState) {
+                                isLoading = false;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(state.errorMsg), backgroundColor: Colors.red,),
+                                );
+                              }
 
-                            if (state is UserSuccessState) {
-                              isLoading = false;
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("User Registered successfully!!"), backgroundColor: Colors.green,),
-                              );
-                              Navigator.pushReplacementNamed(context, AppRoutes.login);
+                              if (state is UserSuccessState) {
+                                isLoading = false;
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("User Registered successfully!!"), backgroundColor: Colors.green,),
+                                );
+                                Navigator.pushReplacementNamed(context, AppRoutes.login);
 
-                            }
-                          },
-                          builder: (_, state) {
-                            return ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                foregroundColor: Colors.white,
-                              ),
-                              onPressed: () {
-                                if(_formKey.currentState!.validate()){
-                                  String name = fullNameController.text;
-                                  String email = emailController.text;
-                                  String mobNo = phoneController.text;
-                                  String pass = passwordController.text;
+                              }
+                            },
+                            builder: (_, state) {
+                              return ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange,
+                                  foregroundColor: Colors.white,
+                                ),
+                                onPressed: () {
+                                  if(_formKey.currentState!.validate()){
+                                    String name = fullNameController.text;
+                                    String email = emailController.text;
+                                    String mobNo = phoneController.text;
+                                    String pass = passwordController.text;
 
-                                  context.read<UserBloc>().add(
-                                    RegisterUserEvent(
-                                      name: name,
-                                      email: email,
-                                      mobNo: mobNo,
-                                      pass: pass,
+                                    context.read<UserBloc>().add(
+                                      RegisterUserEvent(
+                                        name: name,
+                                        email: email,
+                                        mobNo: mobNo,
+                                        pass: pass,
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: isLoading ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                      child: CircularProgressIndicator( color: Colors.white,),
                                     ),
-                                  );
-                                }
-                              },
-                              child: isLoading ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 5.0),
-                                    child: CircularProgressIndicator( color: Colors.white,),
-                                  ),
-                                  SizedBox(
-                                    width: 11,
-                                  ),
-                                  Text("Registering..")
-                                ],
-                              ) : Text('Register'),
-                            );
-                          },
+                                    SizedBox(
+                                      width: 11,
+                                    ),
+                                    Text("Registering..")
+                                  ],
+                                ) : Text('Register'),
+                              );
+                            },
+                          ),
                         ),
-                      ),
                       const SocialLoginButtons()
                     ],
                   ),

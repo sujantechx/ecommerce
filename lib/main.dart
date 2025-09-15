@@ -1,5 +1,7 @@
+import 'package:ecommerce/bloc/product/product_bloc.dart';
 import 'package:ecommerce/bloc/user/user_bloc.dart';
 import 'package:ecommerce/data/remote/helper/api_helper.dart';
+import 'package:ecommerce/data/remote/repository/products_repository.dart';
 import 'package:ecommerce/data/remote/repository/user_repo.dart';
 import 'package:ecommerce/domain/constants/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,7 @@ void main()  {
     BlocProvider(create: (context) => UserBloc(
         userRepository: UserRepository(
             apiHelper: ApiHelper())),),
+    BlocProvider(create:(context) => ProductBloc(productRepository: ProductRepository(apiHelper: ApiHelper())),)
 
   ],child:  MyApp(),));
 

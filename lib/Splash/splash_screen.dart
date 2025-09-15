@@ -8,6 +8,7 @@ import '../domain/constants/app_routes.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
+
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
@@ -17,23 +18,22 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(Duration(seconds:2),(){
-      _chackeStatus();
+      _checkStatus();
       Navigator.pushReplacementNamed(context, AppRoutes.intro);
     });
   }
-  Future<void>_chackeStatus()async{
-    final prefs=await SharedPreferences.getInstance();
-    bool isFirstTime=prefs.getBool('isFirstTime')??true;
-    bool isLoggedIn=prefs.getBool('isLoggedIn')??false;
-  if(isLoggedIn){
-    Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
-  }
-  else if(isFirstTime){
-    Navigator.pushReplacementNamed(context, AppRoutes.intro);
-  }else{
-    Navigator.pushReplacementNamed(context, AppRoutes.auth);
-  }
+  Future<void>_checkStatus() async{
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token") ?? "";
+
+    String nextPage = AppRoutes.login;
+
+    if(token.isNotEmpty){
+      nextPage = AppRoutes.dashboard;
+    }
+
+    Navigator.pushReplacementNamed(context, nextPage);
   }
   @override
   Widget build(BuildContext context) {

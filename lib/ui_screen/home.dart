@@ -1,10 +1,15 @@
 import 'package:ecommerce/domain/constants/app_routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-// Create simple classes to hold data model
+import '../bloc/product/product_bloc.dart';
+import '../bloc/product/product_event.dart';
+import '../bloc/product/product_state.dart';
+import '../model/products_model.dart';
 
+// Create simple classes to hold data model
 class Category {
   final String name;
   final String icon;
@@ -39,6 +44,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final PageController _pageController = PageController();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProductBloc>().add(GetProductsEvent(catId: null));
+  }
 
   //  Data using the models
   final List<Offer> _offers = const [
@@ -135,7 +146,7 @@ class _HomeState extends State<Home> {
             },
           ),
 
-          Padding(
+          /*Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: SmoothPageIndicator(
               controller: _pageController,
@@ -148,7 +159,7 @@ class _HomeState extends State<Home> {
                 spacing: 10,
               ),
             ),
-          ),
+          ),*/
         ],
       ),
     );
@@ -202,29 +213,47 @@ class _HomeState extends State<Home> {
 
   /// Builds the grid of product cards.
   Widget _buildProductGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.75,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-      ),
-      itemCount: _products.length,
-      itemBuilder: (context, index) {
-        final product = _products[index];
-        return InkWell(
-          onTap: () {
-            Navigator.pushNamed(context, AppRoutes.productDetails);
-          },
-            child: _buildProductCard(product)); // Use a helper for the card UI
-      },
+    return BlocBuilder<ProductBloc, ProductState>(
+        builder: (context, state) {
+
+          if(state is ProductLoadingState){
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if(state is ProductFailureState){
+            return Center(child: Text(state.errorMsg));
+          }
+
+          if(state is ProductLoadedState){
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.75,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+              ),
+              itemCount: state.mProducts.length,
+              itemBuilder: (context, index) {
+                final product = state.mProducts[index];
+                return InkWell(
+                    onTap: () {
+                      //Navigator.pushNamed(context, AppRoutes.productDetails);
+                    },
+                    child: _buildProductCard(product)); // Use a helper for the card UI
+              },
+            );
+          }
+
+
+          return Container();
+        }
     );
   }
 
   /// Builds a single product card.
-  Widget _buildProductCard(Product product) {
+  Widget _buildProductCard(ProductModel product) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
@@ -239,7 +268,7 @@ class _HomeState extends State<Home> {
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                   child: Image.network(
-                    product.imageUrl,
+                    product.image ?? "",
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
@@ -248,7 +277,7 @@ class _HomeState extends State<Home> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  product.name,
+                  product.name ?? "No Name",
                   style: const TextStyle(fontWeight: FontWeight.bold),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -257,7 +286,7 @@ class _HomeState extends State<Home> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(
-                  "\$${product.price.toStringAsFixed(2)}",
+                  "\$${product.price}",
                   style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -278,12 +307,11 @@ class _HomeState extends State<Home> {
               ),
               child: IconButton(
                 onPressed: () {
-                  setState(() {
+                  /*setState(() {
                     product.isFavorite = !product.isFavorite;
-                  });
+                  });*/
                 },
-                icon: Icon(
-                  product.isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                icon: Icon(CupertinoIcons.heart,
                   color: Colors.white,
                   size: 20,
                 ),
