@@ -1,65 +1,107 @@
-import 'package:ecommerce/dashbord/provider/provider_nav.dart';
-import 'package:ecommerce/ui_screen/catlog.dart';
+
+
+
 import 'package:ecommerce/ui_screen/favourite.dart';
 import 'package:ecommerce/ui_screen/home.dart';
-import 'package:ecommerce/ui_screen/menu_dash.dart';
 import 'package:ecommerce/ui_screen/profile.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class DashBord extends StatefulWidget {
-  const DashBord({super.key});
+import '../ui_screen/catlog.dart';
+
+class DashboardPage extends StatefulWidget {
+  const DashboardPage({super.key});
 
   @override
-  State<DashBord> createState() => _DashBordState();
+  State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashBordState extends State<DashBord> {
-  // int selectedNavIndex=0;
+class _DashboardPageState extends State<DashboardPage> {
+  int selectedNavIndex=0;
   List<Widget> mNavPages=[
-    MenuDash(),
+    Home() ,
     Favourite(),
     Home(),
-    Catlog(),
+    CartPage(),
     ProfileScreen(),
   ];
   @override
   Widget build(BuildContext context) {
-    return Consumer<ProviderNav>(
-        builder:(_,provider,__){
-          return Scaffold(
-            body: mNavPages[provider.getCurentPageIndex()],
-            bottomNavigationBar: BottomNavigationBar(
-                elevation: 11,
-                iconSize: 25,
-                showSelectedLabels: false,
-                currentIndex: provider.getCurentPageIndex(),
-                selectedItemColor: Colors.orange,
-                unselectedItemColor: Colors.grey,
-                onTap: (index) {
-                  // selectedNavIndex=index;
-                  setState(() {
+    return Scaffold(
+      extendBody: true,
+      body: mNavPages[selectedNavIndex],
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.orange,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        ),
+        onPressed: (){
+          selectedNavIndex=2;
+          setState(() {
 
-                  });
-                  provider.updatePageIndex(index: index);
-                },
+          });
+        }, child: Icon(Icons.home, color: Colors.white),),
+      bottomNavigationBar: BottomAppBar(
+        notchMargin: 5,
+        shape: CircularNotchedRectangle(),
+        elevation: 16,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IconButton(onPressed: (){
+              selectedNavIndex=0;
+              setState(() {
+
+              });
+            }, icon: Icon(selectedNavIndex==0 ? Icons.category : Icons.category_outlined, color: selectedNavIndex==0 ? Colors.orange : Colors.grey,)),
+            IconButton(onPressed: (){
+              selectedNavIndex=1;
+              setState(() {
+
+              });
+            }, icon: Icon(selectedNavIndex==1 ? Icons.favorite : Icons.favorite_border, color: selectedNavIndex==1 ? Colors.orange : Colors.grey,)),
+            SizedBox(width: 50,),
+            IconButton(onPressed: (){
+              selectedNavIndex=3;
+              setState(() {
+
+              });
+            }, icon: Icon(Icons.shopping_cart_outlined, color: selectedNavIndex==3 ? Colors.orange : Colors.grey,)),
+            IconButton(onPressed: (){
+              selectedNavIndex=4;
+              setState(() {
+
+              });
+            }, icon: Icon(Icons.person_outline, color: selectedNavIndex==4 ? Colors.orange : Colors.grey,)),
+          ],
+        ),
+        /* iconSize: 25,
+          showSelectedLabels: false,
+          currentIndex: selectedNavIndex,
+          selectedItemColor: Colors.orange,
+          unselectedItemColor: Colors.grey,
+          onTap: (index) {
+            selectedNavIndex=index;
+            setState(() {
+
+            });
+            //provider.updatePageIndex(index: index);
+          },
 
 
-                items: [
-                  BottomNavigationBarItem(activeIcon: Icon(Icons.category_outlined),label: "Category",icon: Icon(Icons.category),),
-                  BottomNavigationBarItem(activeIcon: Icon(Icons.favorite_border_outlined),label: "Favorite",icon: Icon(Icons.favorite_border),),
-                  BottomNavigationBarItem(activeIcon: Icon(Icons.home),label: "Home",icon: Icon(Icons.home_outlined),),
-                  BottomNavigationBarItem(activeIcon: Icon(Icons.shopping_cart_rounded),label: "Home",icon: Icon(Icons.shopping_cart),),
-                  BottomNavigationBarItem(icon: Icon(Icons.person),label: "Profile"),
+          items: [
+            BottomNavigationBarItem(activeIcon: Icon(Icons.category_outlined),label: "Category",icon: Icon(Icons.category),),
+            BottomNavigationBarItem(activeIcon: Icon(Icons.favorite_border_outlined),label: "Favorite",icon: Icon(Icons.favorite_border),),
+            BottomNavigationBarItem(activeIcon: Icon(Icons.shopping_cart_rounded),label: "Home",icon: Icon(Icons.shopping_cart),),
+            BottomNavigationBarItem(icon: Icon(Icons.person),label: "Profile"),
 
-                ]
+          ]*/
 
-            ),
+      ),
 
-          );
-
-        }
     );
 
   }

@@ -29,6 +29,6 @@ class AppRoutes{
     productDetails: (_) => ProductDetails(),
     dashboard: (_) => ChangeNotifierProvider(
       create: (context) => ProviderNav(),
-      child: DashBord(),),
+      child: DashboardPage(),),
     // add: (_) => AddPage(),
 };}

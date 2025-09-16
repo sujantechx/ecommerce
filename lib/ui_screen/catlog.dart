@@ -1,7 +1,14 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+
+import '../bloc/cart/cart_bloc.dart';
+import '../bloc/cart/cart_event.dart';
+import '../bloc/cart/cart_state.dart';
+import '../model/cart_model.dart';
 // Data Model
 class CartItem {
   final String name;
@@ -19,25 +26,48 @@ class CartItem {
   });
 }
 
-class Catlog extends StatefulWidget {
-  const Catlog({super.key});
+class CartPage extends StatefulWidget {
+  const CartPage({super.key});
 
   @override
-  State<Catlog> createState() => _Catlog();
+  State<CartPage> createState() => _CartPageState();
 }
 
-class _Catlog extends State<Catlog> {
+class _CartPageState extends State<CartPage> {
   final List<CartItem> _cartItems = [
     CartItem(name: "Woman Sweater", category: "Woman Fashion", price: 70.00, imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaUW_iC9HrJ1wzvx4kgNYlewfmafMAiyZuKWUajIGDYpWxYgAcAhbVn9FqJwBjrV9-bmo&usqp=CAU"),
     CartItem(name: "Smart Watch", category: "Electronics", price: 55.00, imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"),
     CartItem(name: "Wireless Headphone", category: "Electronics", price: 120.00, imageUrl: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&q=80"),
   ];
 
+  List<Map> couponList = [
+    ///1->percent, 2->flat
+    {
+      "code" : "ecomm10",
+      "value" : 10,
+      "flag" : 1,
+      "minPrice" : 15000
+    },
+
+    {
+      "code" : "flat500",
+      "value" : 500,
+      "flag" : 2,
+      "minPrice" : 20000
+    }
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<CartBloc>().add(FetchCartEvent());
+  }
+
   @override
   Widget build(BuildContext context) {
     // Calculate totals every time the UI rebuilds.
-    double subtotal = _cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
-    final currencyFormat = NumberFormat.currency(locale: 'en_US', symbol: '\$');
+    /* double subtotal = _cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
+    final currencyFormat = NumberFormat.currency(locale: 'en_US', symbol: '\$');*/
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -45,7 +75,7 @@ class _Catlog extends State<Catlog> {
         backgroundColor: Colors.grey[100],
         elevation: 0,
         centerTitle: true,
-        leading: const BackButton(color: Colors.black),
+        //leading: const BackButton(color: Colors.black),
         title: const Text(
           "My Cart",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
@@ -55,16 +85,35 @@ class _Catlog extends State<Catlog> {
         children: [
           //  List of Cart Items
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              itemCount: _cartItems.length,
-              itemBuilder: (context, index) {
-                return _buildCartItemCard(_cartItems[index]);
-              },
+            child: BlocBuilder<CartBloc, CartState>(
+                builder: (context, state) {
+
+                  if(state is CartLoadingState){
+                    return const Center(child: CircularProgressIndicator(color: Colors.orange,));
+                  }
+
+                  if(state is CartFailureState){
+                    return Center(child: Text(state.errorMsg));
+                  }
+
+                  if(state is CartSuccessState){
+                    return state.cartList!=null && state.cartList!.isNotEmpty ? ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      itemCount: state.cartList!.length,
+                      itemBuilder: (context, index) {
+                        return _buildCartItemCard(state.cartList![index]);
+                      },
+                    ) : const Center(child: Text("No items in cart"));
+                  }
+
+
+
+                  return Container();
+                }
             ),
           ),
           //  Checkout Section
-          _buildCheckoutSection(subtotal, currencyFormat),
+          _buildCheckoutSection(0, NumberFormat.currency(locale: 'en_US', symbol: '\$')),
         ],
       ),
     );
@@ -72,7 +121,7 @@ class _Catlog extends State<Catlog> {
 
 
   /// Builds a single card for a cart item.
-  Widget _buildCartItemCard(CartItem item) {
+  Widget _buildCartItemCard(CartModel item) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       padding: const EdgeInsets.all(12.0),
@@ -99,7 +148,7 @@ class _Catlog extends State<Catlog> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12.0),
-              child: Image.network(item.imageUrl, fit: BoxFit.contain),
+              child: Image.network(item.image!, fit: BoxFit.contain),
             ),
           ),
           const SizedBox(width: 16),
@@ -108,12 +157,12 @@ class _Catlog extends State<Catlog> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Text(item.category, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                const SizedBox(height: 8),
+                Text(item.name!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                /* const SizedBox(height: 4),
+                Text(item., style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                */const SizedBox(height: 8),
                 Text(
-                  NumberFormat.currency(locale: 'en_US', symbol: '\$').format(item.price),
+                  NumberFormat.currency(locale: 'en_US', symbol: '\$').format(double.parse(item.price!)),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -125,7 +174,7 @@ class _Catlog extends State<Catlog> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: Icon(CupertinoIcons.delete, color: Colors.red[400], size: 20),
+                icon: Icon(CupertinoIcons.delete, color: Colors.orange, size: 20),
                 onPressed: () {
                   setState(() {
                     _cartItems.remove(item);
@@ -142,7 +191,7 @@ class _Catlog extends State<Catlog> {
   }
 
   /// Builds the quantity selector for an item.
-  Widget _buildQuantitySelector(CartItem item) {
+  Widget _buildQuantitySelector(CartModel item) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey[200],
@@ -156,11 +205,7 @@ class _Catlog extends State<Catlog> {
             splashRadius: 16,
             icon: const Icon(CupertinoIcons.minus),
             onPressed: () {
-              if (item.quantity > 1) {
-                setState(() {
-                  item.quantity--;
-                });
-              }
+
             },
           ),
           Text(item.quantity.toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -169,9 +214,7 @@ class _Catlog extends State<Catlog> {
             splashRadius: 16,
             icon: const Icon(CupertinoIcons.add),
             onPressed: () {
-              setState(() {
-                item.quantity++;
-              });
+
             },
           ),
         ],
@@ -182,7 +225,7 @@ class _Catlog extends State<Catlog> {
   /// Builds the bottom section with totals and the checkout button.
   Widget _buildCheckoutSection(double subtotal, NumberFormat currencyFormat) {
     return Container(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 24.0, bottom: 150),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30.0)),
