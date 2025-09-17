@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../bloc/cart/cart_bloc.dart';
 import '../bloc/cart/cart_event.dart';
 import '../bloc/cart/cart_state.dart';
+import '../domain/Utils/coupon_service.dart';
 import '../model/cart_model.dart';
 // Data Model
 class CartItem {
@@ -34,29 +35,41 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-  final List<CartItem> _cartItems = [
-    CartItem(name: "Woman Sweater", category: "Woman Fashion", price: 70.00, imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaUW_iC9HrJ1wzvx4kgNYlewfmafMAiyZuKWUajIGDYpWxYgAcAhbVn9FqJwBjrV9-bmo&usqp=CAU"),
-    CartItem(name: "Smart Watch", category: "Electronics", price: 55.00, imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"),
-    CartItem(name: "Wireless Headphone", category: "Electronics", price: 120.00, imageUrl: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&q=80"),
-  ];
+// --- ADD THESE NEW STATE VARIABLES ---
+  final _couponService = CouponService();
+  final _couponController = TextEditingController();
+  Coupon? _appliedCoupon;
+  String? _couponError;
+  bool _isApplyingCoupon = false;
 
-  List<Map> couponList = [
-    ///1->percent, 2->flat
-    {
-      "code" : "ecomm10",
-      "value" : 10,
-      "flag" : 1,
-      "minPrice" : 15000
-    },
+  // --- ADD THIS NEW METHOD TO HANDLE THE LOGIC ---
+  void _applyCoupon() async {
+    if (_isApplyingCoupon) return;
 
-    {
-      "code" : "flat500",
-      "value" : 500,
-      "flag" : 2,
-      "minPrice" : 20000
-    }
-  ];
+    setState(() {
+      _isApplyingCoupon = true;
+      _couponError = null;
+    });
 
+    final code = _couponController.text;
+    final coupon = await _couponService.validateCoupon(code);
+
+    setState(() {
+      if (coupon != null) {
+        _appliedCoupon = coupon;
+      } else {
+        _appliedCoupon = null; // Clear any previously applied coupon
+        _couponError = "Invalid coupon code";
+      }
+      _isApplyingCoupon = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _couponController.dispose();
+    super.dispose();
+  }
   @override
   void initState() {
     super.initState();
@@ -85,35 +98,59 @@ class _CartPageState extends State<CartPage> {
         children: [
           //  List of Cart Items
           Expanded(
-            child: BlocBuilder<CartBloc, CartState>(
-                builder: (context, state) {
+            child:BlocBuilder<CartBloc, CartState>(
+      builder: (context, state) {
+        // --- DEFINE ALL FINANCIAL VARIABLES HERE ---
+        double subtotal = 0;
+        double discount = 0;
+        double total = 0;
+        final currencyFormat = NumberFormat.currency(locale: 'en_US', symbol: '\$');
 
-                  if(state is CartLoadingState){
-                    return const Center(child: CircularProgressIndicator(color: Colors.orange,));
-                  }
+        if (state is CartSuccessState && state.cartList != null && state.cartList!.isNotEmpty) {
+          // 1. Calculate Subtotal
+          subtotal = state.cartList!.fold(0.0, (sum, item) => sum + (double.parse(item.price!) * item.quantity!));
 
-                  if(state is CartFailureState){
-                    return Center(child: Text(state.errorMsg));
-                  }
+          // 2. Calculate Discount based on the applied coupon
+          if (_appliedCoupon != null) {
+            if (_appliedCoupon!.type == DiscountType.percentage) {
+              discount = subtotal * (_appliedCoupon!.value / 100);
+            } else {
+              discount = _appliedCoupon!.value;
+            }
+          }
 
-                  if(state is CartSuccessState){
-                    return state.cartList!=null && state.cartList!.isNotEmpty ? ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      itemCount: state.cartList!.length,
-                      itemBuilder: (context, index) {
-                        return _buildCartItemCard(state.cartList![index]);
-                      },
-                    ) : const Center(child: Text("No items in cart"));
-                  }
+          // 3. Calculate Final Total (ensure it doesn't go below zero)
+          total = (subtotal - discount).clamp(0, double.infinity);
+        }
 
-
-
-                  return Container();
+        // --- BUILD THE UI ---
+        return Column(
+          children: [
+            Expanded(
+              child: () {
+                if (state is CartLoadingState) return const Center(child: CircularProgressIndicator());
+                if (state is CartFailureState) return Center(child: Text(state.errorMsg));
+                if (state is CartSuccessState) {
+                  return state.cartList != null && state.cartList!.isNotEmpty
+                      ?                           ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    itemCount: state.cartList!.length,
+                    itemBuilder: (context, index) {
+                      return _buildCartItemCard(state.cartList![index]);
+                    },
+                  )
+                  // Your existing ListView
+                      : const Center(child: Text("No items in cart"));
                 }
+                return const SizedBox.shrink();
+              }(),
             ),
-          ),
-          //  Checkout Section
-          _buildCheckoutSection(0, NumberFormat.currency(locale: 'en_US', symbol: '\$')),
+            // Pass all calculated values to the checkout section
+            _buildCheckoutSection(subtotal, discount as double, total, currencyFormat),
+          ],
+        );
+      },
+      ),),
         ],
       ),
     );
@@ -173,14 +210,14 @@ class _CartPageState extends State<CartPage> {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
+             /* IconButton(
                 icon: Icon(CupertinoIcons.delete, color: Colors.orange, size: 20),
                 onPressed: () {
                   setState(() {
                     _cartItems.remove(item);
                   });
                 },
-              ),
+              ),*/
               const SizedBox(height: 8),
               _buildQuantitySelector(item),
             ],
@@ -205,17 +242,35 @@ class _CartPageState extends State<CartPage> {
             splashRadius: 16,
             icon: const Icon(CupertinoIcons.minus),
             onPressed: () {
+              // Dispatch the decrement event
+              context.read<CartBloc>().add(UpdateCartQuantityEvent(item: item, action: "decrement"));
 
             },
           ),
-          Text(item.quantity.toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
+          // Show a small loader while re-fetching
+          BlocBuilder<CartBloc, CartState>(
+            builder: (context, state) {
+              if (state is CartLoadingState) {
+                // Check if the loading state was triggered by this specific item's update
+                // This is an advanced check; for now, a general indicator is fine.
+                return const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                );
+              }
+              return Text(item.quantity.toString(), style: const TextStyle(fontWeight: FontWeight.bold));
+            },
+          ),
           IconButton(
             iconSize: 16,
             splashRadius: 16,
             icon: const Icon(CupertinoIcons.add),
             onPressed: () {
-
+              // Dispatch the increment event
+              context.read<CartBloc>().add(UpdateCartQuantityEvent(item: item, action: "increment"));
             },
+
           ),
         ],
       ),
@@ -223,7 +278,7 @@ class _CartPageState extends State<CartPage> {
   }
 
   /// Builds the bottom section with totals and the checkout button.
-  Widget _buildCheckoutSection(double subtotal, NumberFormat currencyFormat) {
+  Widget _buildCheckoutSection(double subtotal, double discount, double total, NumberFormat currencyFormat) {
     return Container(
       padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 24.0, bottom: 150),
       decoration: BoxDecoration(
@@ -242,22 +297,22 @@ class _CartPageState extends State<CartPage> {
         children: [
           // Discount Code
           TextField(
+            controller: _couponController,
             decoration: InputDecoration(
               hintText: 'Enter Discount Code',
-              hintStyle: TextStyle(color: Colors.grey[400]),
+              errorText: _couponError, // Display error message here
               filled: true,
               fillColor: Colors.grey[100],
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.0),
-                borderSide: BorderSide.none,
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0), borderSide: BorderSide.none),
               suffixIcon: TextButton(
-                onPressed: () {},
-                child: const Text('Apply', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                onPressed: _applyCoupon, // Call our new method
+                child: _isApplyingCoupon
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Text('Apply', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 5),
           // Totals
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -266,12 +321,27 @@ class _CartPageState extends State<CartPage> {
               Text(currencyFormat.format(subtotal), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ],
           ),
+          const SizedBox(height: 5),
+          // Conditionally show the Discount row
+          if (_appliedCoupon != null) ...[
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Discount (${_appliedCoupon!.code})', style: const TextStyle(fontSize: 16, color: Colors.grey)),
+                Text('-${currencyFormat.format(discount)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+              ],
+            ),
+          ],
           const SizedBox(height: 12),
+          const Divider(),
+          const SizedBox(height: 12),
+          // Final Total
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Total', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              Text(currencyFormat.format(subtotal), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(currencyFormat.format(total), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 20),

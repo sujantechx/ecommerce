@@ -1,13 +1,19 @@
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ecommerce/ui_screen/products_by_category_screen.dart';
+import 'package:ecommerce/ui_screen/see_all.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/category/category_bloc.dart';
+import '../bloc/category/category_event.dart';
+import '../bloc/category/category_state.dart';
 import '../bloc/product/product_bloc.dart';
 import '../bloc/product/product_event.dart';
 import '../bloc/product/product_state.dart';
 import '../domain/constants/app_routes.dart';
+import '../model/category_model.dart';
 import '../model/products_model.dart';
 import '../widgets/app_color_list.dart';
 
@@ -52,6 +58,8 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     context.read<ProductBloc>().add(GetProductsEvent(catId: null));
+    // Trigger the fetch event when the screen is first loaded
+    context.read<CategoryBloc>().add(FetchCategoriesEvent());
   }
 
   //  Data using the models
@@ -75,20 +83,29 @@ class _HomeState extends State<Home> {
 
   // Using a List instead of final to allow `isFavorite` to be changed
   final List<Product> _products = [
-    Product(name: "Wireless Headphones", price: 120.00, imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"),
-    Product(name: "Woman Sweater", price: 70.00, imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaUW_iC9HrJ1wzvx4kgNYlewfmafMAiyZuKWUajIGDYpWxYgAcAhbVn9FqJwBjrV9-bmo&usqp=CAU"),
-    Product(name: "Smart Watch", price: 55.00, imageUrl: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&q=80"),
-    Product(name: "Sneakers", price: 90.00, imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80"),
+    Product(name: "Wireless Headphones",
+        price: 120.00,
+        imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"),
+    Product(name: "Woman Sweater",
+        price: 70.00,
+        imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaUW_iC9HrJ1wzvx4kgNYlewfmafMAiyZuKWUajIGDYpWxYgAcAhbVn9FqJwBjrV9-bmo&usqp=CAU"),
+    Product(name: "Smart Watch",
+        price: 55.00,
+        imageUrl: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&q=80"),
+    Product(name: "Sneakers",
+        price: 90.00,
+        imageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80"),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.square_grid_2x2)),
+        leading: IconButton(
+            onPressed: () {}, icon: const Icon(CupertinoIcons.square_grid_2x2)),
         title: const Text("E-Commerce"),
         centerTitle: true,
-        actions: [IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.bell))],
+
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -100,7 +117,7 @@ class _HomeState extends State<Home> {
             const SizedBox(height: 24),
             _buildOfferCarousel(),
             const SizedBox(height: 24),
-            _buildCategoryList(),
+            _buildCategorySection(),
             const SizedBox(height: 24),
             _buildSectionHeader("Special For You", "See all"),
             const SizedBox(height: 12),
@@ -134,14 +151,16 @@ class _HomeState extends State<Home> {
       height: 180,
       child: CarouselSlider.builder(
           itemCount: _offers.length,
-          itemBuilder: (_, index, __){
+          itemBuilder: (_, index, __) {
             return Container(
               margin: EdgeInsets.only(left: 11),
               width: double.infinity,
               height: 200,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  image: DecorationImage(image: NetworkImage(_offers[index].imageUrl), fit: BoxFit.cover)
+                  image: DecorationImage(
+                      image: NetworkImage(_offers[index].imageUrl),
+                      fit: BoxFit.cover)
               ),
             );
           },
@@ -155,33 +174,65 @@ class _HomeState extends State<Home> {
   }
 
   /// Builds the horizontally scrolling category list.
-  Widget _buildCategoryList() {
+  Widget _buildCategorySection(){
+    return BlocBuilder<CategoryBloc, CategoryState>(
+      builder: (context, state) {
+        if (state is CategoryLoadingState) {
+          // Show a loader while data is being fetched
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is CategorySuccessState) {
+          // If data is fetched successfully, build the list
+          return _buildCategoryList(state.categories);
+        } else if (state is CategoryFailureState) {
+          // If there's an error, display it
+          return Center(child: Text('Error: ${state.errorMsg}'));
+        }
+        // Initial state or any other state
+        return const SizedBox.shrink();
+      },
+    );
+  }
+  // Your original UI code, now accepting a list of models
+  Widget _buildCategoryList(List<CategoryModel> categories) {
     return SizedBox(
       height: 90,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: _categories.length,
+        itemCount: categories.length,
         itemBuilder: (context, index) {
-          final category = _categories[index];
-          return Container(
-            width: 80,
-            margin: const EdgeInsets.only(right: 8),
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.orange.shade100,
-                  child: Text(category.icon, style: const TextStyle(fontSize: 24)),
+          final category = categories[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProductsByCategoryScreen(
+                    categoryId: category.id,
+                    categoryName: category.name,
+                  ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  category.name,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                ),
-              ],
+              );
+            },
+            child: Container(
+              width: 80,
+              margin: const EdgeInsets.only(right: 8),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.orange.shade100,
+                    child: Text(category.icon, style: const TextStyle(fontSize: 24)),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    category.name,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -195,7 +246,12 @@ class _HomeState extends State<Home> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        Text(actionText, style: TextStyle(color: Colors.grey.shade600)),
+        InkWell(
+          onTap: (){
+            Navigator.push(context,MaterialPageRoute(builder: (context) => SeeAll(),));
+          },
+
+            child: Text(actionText, style: TextStyle(color: Colors.grey.shade600))),
       ],
     );
   }

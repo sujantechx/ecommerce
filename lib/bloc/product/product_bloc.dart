@@ -32,5 +32,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         emit(ProductErrorState(errorMsg: e.toString()));
       }
     });
+
+    on<FetchProductsByCategoryEvent>((event, emit) async {
+      emit(ProductLoadingState());
+      try {
+        final products = await productRepository.getProductsByCategory(event.categoryId);
+        emit(ProductSuccessState(products: products));
+      } catch (e) {
+        emit(ProductErrorState(errorMsg: e.toString()));
+      }
+    });
   }
-}
+  }

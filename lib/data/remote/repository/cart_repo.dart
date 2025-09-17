@@ -19,8 +19,23 @@ class CartRepository{
       rethrow;
     }
 
+  } Future<void> updateCartQuantity({
+    required String cartItemId,
+    required String action, // e.g., "increment" or "decrement"
+  }) async {
+    try {
+      await apiHelper.postAPI(
+        url: AppUrls.updateCartQuantityUrl,
+        mBody: {
+          'cart_item_id': cartItemId,
+          'action': action,
+        },
+        isAuth: true,
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
-
   ///fetchCart
   fetchCart() async{
     try{

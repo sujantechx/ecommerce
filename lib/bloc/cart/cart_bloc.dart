@@ -28,6 +28,21 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       }
     });
 
+    on<UpdateCartQuantityEvent>((event, emit) async {
+      try {
+        await cartRepository.updateCartQuantity(
+          // Make sure your CartModel has a unique ID for the cart entry
+          cartItemId: event.item.id.toString(),
+          action: event.action,
+        );
+        // On success, re-fetch the entire cart to ensure data is in sync
+        add(FetchCartEvent());
+      } catch (e) {
+        // You can emit a specific error state here if needed,
+        // but re-fetching will handle showing the user the last valid state.
+      }
+    });
+
     on<FetchCartEvent>((event, emit) async{
 
       emit(CartLoadingState());

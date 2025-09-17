@@ -13,7 +13,10 @@ class ProductLoadedState extends ProductState {
 
   ProductLoadedState({required this.mProducts});
 }
-
+class ProductSuccessState extends ProductState {
+  final List<ProductModel> products;
+  ProductSuccessState({required this.products});
+}
 class ProductErrorState extends ProductState {
   String errorMsg;
 
