@@ -17,7 +17,6 @@ class CartItem {
   final double price;
   final String imageUrl;
   int quantity;
-
   CartItem({
     required this.name,
     required this.category,

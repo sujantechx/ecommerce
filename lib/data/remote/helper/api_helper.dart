@@ -36,6 +36,34 @@ class ApiHelper {
 
   }
 
+  Future<dynamic> getApi({
+    required String url,
+    Map<String, String>? mHeaders,
+    bool isAuth = false,
+  }) async {
+    mHeaders ??= {};
+
+    if (isAuth) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String token = prefs.getString("token") ?? "";
+      mHeaders["Authorization"] = "Bearer $token";
+    }
+
+    try {
+      var response = await http.get(
+        Uri.parse(url),
+        headers: mHeaders,
+      );
+
+      print("res : ${response.body}");
+      return parsedResponse(response);
+    } on SocketException catch (e) {
+      throw NoInternetException(desc: "Not connected to network, ${e.message}");
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<dynamic> postAPI({
     required String url,
     Map<String, String>? mHeaders,

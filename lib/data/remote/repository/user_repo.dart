@@ -1,7 +1,12 @@
 
 
+import 'dart:convert';
+
 import 'package:ecommerce/data/remote/helper/api_helper.dart';
 import 'package:ecommerce/domain/constants/app_urls.dart';
+import 'package:http/http.dart' as http;
+
+import '../../../model/user_model.dart';
 
 class UserRepository {
   ApiHelper apiHelper;
@@ -37,4 +42,23 @@ class UserRepository {
       rethrow;
     }
   }
+
+// Dart
+
+  Future<UserModel?> fetchUserProfile(String token) async {
+    final response = await apiHelper.getApi(
+      url: AppUrls.userProfileUrl,
+      isAuth: true,
+      mHeaders: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+    print('API response: $response'); // response is already a Map
+
+    if (response['status'] == true && response['data'] != null) {
+      return UserModel.fromJson(response['data']);
+    }
+    return null;
+  }
+
 }

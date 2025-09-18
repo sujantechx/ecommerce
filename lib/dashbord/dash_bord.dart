@@ -1,6 +1,7 @@
 
 
 
+import 'package:ecommerce/model/user_model.dart';
 import 'package:ecommerce/ui_screen/favourite.dart';
 import 'package:ecommerce/ui_screen/home.dart';
 import 'package:ecommerce/ui_screen/profile.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../ui_screen/catlog.dart';
 
@@ -19,14 +21,27 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+
+// Helper to get token from SharedPreferences
+  static Future<String?> getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
   int selectedNavIndex=0;
   List<Widget> mNavPages=[
     Home() ,
     Favourite(),
     Home(),
     CartPage(),
-    ProfileScreen(),
-  ];
+    FutureBuilder<String?>(
+      future: getToken(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+          return ProfileScreen(token: snapshot.data!);
+        }
+        return Center(child: CircularProgressIndicator());
+      },
+    ),  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
