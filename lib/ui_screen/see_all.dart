@@ -1,5 +1,3 @@
-import 'package:carousel_slider/carousel_options.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:ecommerce/ui_screen/products_by_category_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/category/category_bloc.dart';
 import '../bloc/category/category_event.dart';
+
 import '../bloc/category/category_state.dart';
 import '../bloc/product/product_bloc.dart';
 import '../bloc/product/product_event.dart';
 import '../bloc/product/product_state.dart';
 import '../domain/constants/app_routes.dart';
+
 import '../model/category_model.dart';
 import '../model/products_model.dart';
 import '../widgets/app_color_list.dart';
@@ -40,12 +40,17 @@ class _SeeAllState extends State<SeeAll> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () {}, icon: const Icon(CupertinoIcons.square_grid_2x2)),
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (context) => _buildCategorySection(),
+            );
+          },
+          icon: const Icon(CupertinoIcons.square_grid_2x2),
+        ),
         title: const Text("See All"),
         centerTitle: true,
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.bell))
-        ],
+
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -186,6 +191,88 @@ class _SeeAllState extends State<SeeAll> {
             ),
           );
         }
+    );
+  }
+
+  Widget _categorySectionTitle() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        'Categories',
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  /// Builds the horizontally scrolling category list.
+  Widget _buildCategorySection(){
+    return BlocBuilder<CategoryBloc, CategoryState>(
+      builder: (context, state) {
+        if (state is CategoryLoadingState) {
+          // Show a loader while data is being fetched
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is CategorySuccessState) {
+          // If data is fetched successfully, build the list
+          print('Fetched categories: ${state.categories.map((c) => c.id).toList()}');
+
+          // If data is fetched successfully, build the list
+          return _buildCategoryList(state.categories);
+        } else if (state is CategoryFailureState) {
+          // If there's an error, display it
+          return Center(child: Text('Error: ${state.errorMsg}'));
+        }
+        // Initial state or any other state
+        return const SizedBox.shrink();
+      },
+    );
+  }
+  // Your original UI code, now accepting a list of models
+  Widget _buildCategoryList(List<CategoryModel> categories) {
+    return SizedBox(
+      height: 150,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductsByCategoryScreen(
+                      categoryId: category.id,
+                      categoryName: category.name,
+                    ),
+                  ));
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                width: 50,
+                margin: const EdgeInsets.only(right: 8),
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.orange.shade100,
+                      child: Text(category.icon, style: const TextStyle(fontSize: 24)),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      category.name,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

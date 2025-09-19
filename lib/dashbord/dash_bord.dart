@@ -4,7 +4,9 @@
 import 'package:ecommerce/model/user_model.dart';
 import 'package:ecommerce/ui_screen/favourite.dart';
 import 'package:ecommerce/ui_screen/home.dart';
+import 'package:ecommerce/ui_screen/products_by_category_screen.dart';
 import 'package:ecommerce/ui_screen/profile.dart';
+import 'package:ecommerce/ui_screen/see_all.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +31,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
   int selectedNavIndex=0;
   List<Widget> mNavPages=[
-    Home() ,
+    SeeAll(),
     Favourite(),
     Home(),
     CartPage(),

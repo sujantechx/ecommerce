@@ -1,7 +1,10 @@
 
 
 
+import 'dart:convert';
 import 'dart:developer';
+
+import 'package:http/http.dart' as http;
 
 import '../../../domain/constants/app_urls.dart';
 import '../../../model/products_model.dart';
@@ -22,28 +25,24 @@ class ProductRepository {
       rethrow;
     }
   }
-
-  Future<List<ProductModel>> getProductsByCategory(String categoryId) async {
+  /// Fetches products for a specific category by making a POST request.
+  Future<dynamic> fetchProductsByCategory(String categoryId) async {
     try {
-      // 1. Fetch ALL products, since the API doesn't filter.
-      final url = AppUrls.getProductsUrl;
-      final response = await apiHelper.getAPI(url: url);
+      // Your API expects an integer, so we parse the incoming string ID.
+      final int? categoryIdInt = int.tryParse(categoryId);
 
-      log("RESPONSE (ALL PRODUCTS): $response");
+      // If parsing fails (which it shouldn't), you might want to handle it.
+      if (categoryIdInt == null) {
+        throw Exception("Invalid Category ID format: $categoryId");
+      }
 
-      ProductDataModel productDataModel = ProductDataModel.fromJson(response);
-      List<ProductModel> allProducts = productDataModel.data ?? [];
-
-      // 2. Filter the list here in the app.
-      // This keeps only the products where the product's categoryId matches the one we want.
-      List<ProductModel> filteredProducts = allProducts.where((product) {
-        return product.categoryId.toString() == categoryId;
-      }).toList();
-
-      return filteredProducts;
-
+      return await apiHelper.postAPI(
+        url: AppUrls.getProductsUrl,
+        mBody: {"category_id": categoryIdInt},
+      );
     } catch (e) {
-      log("ERROR fetching products for category $categoryId: $e");
+      // Rethrow the error to be caught by the BLoC.
       rethrow;
     }
-  }}
+  }
+}

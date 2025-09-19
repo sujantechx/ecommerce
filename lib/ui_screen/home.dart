@@ -105,6 +105,9 @@ class _HomeState extends State<Home> {
             onPressed: () {}, icon: const Icon(CupertinoIcons.square_grid_2x2)),
         title: const Text("E-Commerce"),
         centerTitle: true,
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(CupertinoIcons.bell))
+        ],
 
       ),
       body: SingleChildScrollView(
@@ -182,6 +185,9 @@ class _HomeState extends State<Home> {
           return const Center(child: CircularProgressIndicator());
         } else if (state is CategorySuccessState) {
           // If data is fetched successfully, build the list
+          print('Fetched categories: ${state.categories.map((c) => c.id).toList()}');
+
+          // If data is fetched successfully, build the list
           return _buildCategoryList(state.categories);
         } else if (state is CategoryFailureState) {
           // If there's an error, display it
@@ -206,12 +212,15 @@ class _HomeState extends State<Home> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ProductsByCategoryScreen(
+                  // builder: (_) => ProductsByCategoryScreen(
+                  //   categoryId: category.id,
+                  //   categoryName: category.name,
+                  // ),
+                  builder: (context) => ProductsByCategoryScreen(
                     categoryId: category.id,
                     categoryName: category.name,
-                  ),
                 ),
-              );
+                ));
             },
             child: Container(
               width: 80,

@@ -1,5 +1,5 @@
 class CategoryModel {
-  final String id;
+  final dynamic id;
   final String name;
   final String icon; // Added to match the UI's needs
 
