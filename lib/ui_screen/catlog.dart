@@ -10,22 +10,6 @@ import '../bloc/cart/cart_event.dart';
 import '../bloc/cart/cart_state.dart';
 import '../domain/Utils/coupon_service.dart';
 import '../model/cart_model.dart';
-// Data Model
-class CartItem {
-  final String name;
-  final String category;
-  final double price;
-  final String imageUrl;
-  int quantity;
-  CartItem({
-    required this.name,
-    required this.category,
-    required this.price,
-    required this.imageUrl,
-    this.quantity = 1,
-  });
-}
-
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
 
@@ -77,9 +61,6 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate totals every time the UI rebuilds.
-    /* double subtotal = _cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
-    final currencyFormat = NumberFormat.currency(locale: 'en_US', symbol: '\$');*/
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -97,8 +78,9 @@ class _CartPageState extends State<CartPage> {
         children: [
           //  List of Cart Items
           Expanded(
-            child:BlocBuilder<CartBloc, CartState>(
-      builder: (context, state) {
+            child:
+            BlocBuilder<CartBloc, CartState>(
+              builder: (context, state) {
         // --- DEFINE ALL FINANCIAL VARIABLES HERE ---
         double subtotal = 0;
         double discount = 0;
@@ -108,7 +90,6 @@ class _CartPageState extends State<CartPage> {
         if (state is CartSuccessState && state.cartList != null && state.cartList!.isNotEmpty) {
           // 1. Calculate Subtotal
           subtotal = state.cartList!.fold(0.0, (sum, item) => sum + (double.parse(item.price!) * item.quantity!));
-
           // 2. Calculate Discount based on the applied coupon
           if (_appliedCoupon != null) {
             if (_appliedCoupon!.type == DiscountType.percentage) {
@@ -117,7 +98,6 @@ class _CartPageState extends State<CartPage> {
               discount = _appliedCoupon!.value;
             }
           }
-
           // 3. Calculate Final Total (ensure it doesn't go below zero)
           total = (subtotal - discount).clamp(0, double.infinity);
         }
@@ -131,7 +111,7 @@ class _CartPageState extends State<CartPage> {
                 if (state is CartFailureState) return Center(child: Text(state.errorMsg));
                 if (state is CartSuccessState) {
                   return state.cartList != null && state.cartList!.isNotEmpty
-                      ?                           ListView.builder(
+                      ? ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     itemCount: state.cartList!.length,
                     itemBuilder: (context, index) {
@@ -139,7 +119,7 @@ class _CartPageState extends State<CartPage> {
                     },
                   )
                   // Your existing ListView
-                      : const Center(child: Text("No items in cart"));
+                  : const Center(child: Text("No items in cart"));
                 }
                 return const SizedBox.shrink();
               }(),
@@ -218,7 +198,7 @@ class _CartPageState extends State<CartPage> {
                 },
               ),*/
               const SizedBox(height: 8),
-              _buildQuantitySelector(item),
+              _buildQuantitySelector(context, item),
             ],
           ),
         ],
@@ -226,56 +206,60 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  /// Builds the quantity selector for an item.
-  Widget _buildQuantitySelector(CartModel item) {
+  /// Builds the quantity selector using an optimistic UI approach.
+
+  /// Builds the quantity selector using an optimistic UI approach.
+  Widget _buildQuantitySelector(BuildContext context, CartModel item) {
     return Container(
+      height: 35, // Giving a fixed height for better alignment
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Decrement Button
           IconButton(
             iconSize: 16,
             splashRadius: 16,
             icon: const Icon(CupertinoIcons.minus),
             onPressed: () {
-              // Dispatch the decrement event
-              context.read<CartBloc>().add(UpdateCartQuantityEvent(item: item, action: "decrement"));
-
-            },
-          ),
-          // Show a small loader while re-fetching
-          BlocBuilder<CartBloc, CartState>(
-            builder: (context, state) {
-              if (state is CartLoadingState) {
-                // Check if the loading state was triggered by this specific item's update
-                // This is an advanced check; for now, a general indicator is fine.
-                return const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+              // Prevent decrementing below 1
+              if (item.quantity! > 1) {
+                context.read<CartBloc>().add(
+                  UpdateCartQuantityEvent(item: item, action: "decrement"),
+                );
+              } else {
+                // If quantity is 1, a press should trigger remove
+                context.read<CartBloc>().add(
+                  RemoveFromCartEvent(cartItemId: item.id.toString()),
                 );
               }
-              return Text(item.quantity.toString(), style: const TextStyle(fontWeight: FontWeight.bold));
             },
           ),
+
+          // Quantity Text (No BlocBuilder needed here)
+          Text(
+            item.quantity.toString(),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+
+          // Increment Button
           IconButton(
             iconSize: 16,
             splashRadius: 16,
             icon: const Icon(CupertinoIcons.add),
             onPressed: () {
-              // Dispatch the increment event
-              context.read<CartBloc>().add(UpdateCartQuantityEvent(item: item, action: "increment"));
+              context.read<CartBloc>().add(
+                UpdateCartQuantityEvent(item: item, action: "increment"),
+              );
             },
-
           ),
         ],
       ),
     );
   }
-
   /// Builds the bottom section with totals and the checkout button.
   Widget _buildCheckoutSection(double subtotal, double discount, double total, NumberFormat currencyFormat) {
     return Container(

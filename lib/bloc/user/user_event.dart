@@ -15,3 +15,4 @@ class LoginUserEvent extends UserEvent {
   String email, pass;
   LoginUserEvent({required this.email, required this.pass});
 }
+class FetchUserProfileEvent extends UserEvent {}

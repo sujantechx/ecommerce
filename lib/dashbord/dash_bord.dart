@@ -1,16 +1,12 @@
 
 
 
-import 'package:ecommerce/model/user_model.dart';
 import 'package:ecommerce/ui_screen/favourite.dart';
 import 'package:ecommerce/ui_screen/home.dart';
-import 'package:ecommerce/ui_screen/products_by_category_screen.dart';
 import 'package:ecommerce/ui_screen/profile.dart';
 import 'package:ecommerce/ui_screen/see_all.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../ui_screen/catlog.dart';
@@ -39,7 +35,7 @@ class _DashboardPageState extends State<DashboardPage> {
       future: getToken(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
-          return ProfileScreen(token: snapshot.data!);
+          return ProfileScreen();
         }
         return Center(child: CircularProgressIndicator());
       },

@@ -52,5 +52,30 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         emit(UserFailureState(errorMsg: e.toString()));
       }
 
-    });  }
+    });
+
+    // Add this new event handler for fetching the profile
+    on<FetchUserProfileEvent>((event, emit) async {
+      emit(UserLoadingState());
+      try {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String? token = prefs.getString('token');
+
+        if (token != null) {
+          final user = await userRepository.fetchUserProfile(token);
+          if (user != null) {
+            emit(UserProfileLoadedState(user: user));
+          } else {
+            emit(UserFailureState(errorMsg: 'Failed to load profile data.'));
+          }
+        } else {
+          emit(UserFailureState(errorMsg: 'Authentication token not found.'));
+        }
+      } catch (e) {
+        emit(UserFailureState(errorMsg: e.toString()));
+      }
+    });
+
+
+  }
 }

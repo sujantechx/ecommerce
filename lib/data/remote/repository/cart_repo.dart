@@ -1,5 +1,7 @@
 
 
+import 'package:http/http.dart' as _apiHelper;
+
 import '../../../domain/constants/app_urls.dart';
 import '../helper/api_helper.dart';
 
@@ -19,7 +21,10 @@ class CartRepository{
       rethrow;
     }
 
-  } Future<void> updateCartQuantity({
+  }
+
+  Future<void> updateCartQuantity({
+
     required String cartItemId,
     required String action, // e.g., "increment" or "decrement"
   }) async {
@@ -40,6 +45,15 @@ class CartRepository{
   fetchCart() async{
     try{
       return await apiHelper.getAPI(url: AppUrls.fetchCartUrl);
+    } catch(e){
+      rethrow;
+    }
+  }
+  Future<dynamic> removeFromCart({required String cartItemId}) async{
+    try{
+      return await apiHelper.postAPI(url: AppUrls.deleteCartUrl, mBody: {
+        "cart_item_id":cartItemId,
+      });
     } catch(e){
       rethrow;
     }

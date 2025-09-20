@@ -16,3 +16,9 @@ class UpdateCartQuantityEvent extends CartEvent {
 
   UpdateCartQuantityEvent({required this.item, required this.action});
 }
+
+class RemoveFromCartEvent extends CartEvent{
+  final String cartItemId;
+
+  RemoveFromCartEvent({required this.cartItemId});
+}

@@ -1,10 +1,7 @@
 
 
 
-import 'dart:convert';
 import 'dart:developer';
-
-import 'package:http/http.dart' as http;
 
 import '../../../domain/constants/app_urls.dart';
 import '../../../model/products_model.dart';
@@ -25,7 +22,7 @@ class ProductRepository {
       rethrow;
     }
   }
-  /// Fetches products for a specific category by making a POST request.
+
   Future<dynamic> fetchProductsByCategory(String categoryId) async {
     try {
       // Your API expects an integer, so we parse the incoming string ID.

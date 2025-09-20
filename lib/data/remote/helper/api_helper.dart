@@ -72,19 +72,16 @@ class ApiHelper {
   }) async {
     if (!isAuth) {
       mHeaders ??= {};
-
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String token = prefs.getString("token") ?? "";
       mHeaders["Authorization"] = "Bearer $token";
     }
-
     try {
       var response = await http.post(
         Uri.parse(url),
         body: mBody != null ? jsonEncode(mBody) : null,
         headers: mHeaders,
       );
-
       print("res : ${response.body}");
       return parsedResponse(response);
     } on SocketException catch (e) {
