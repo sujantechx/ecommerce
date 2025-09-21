@@ -40,20 +40,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         FetchProductsByCategoryEvent event,
         Emitter<ProductState> emit,
         ) async {
-      // 1. Emit loading state to show a progress indicator in the UI.
       emit(ProductLoadingState());
 
       try {
-        // 2. Call the single, consolidated method in the repository.
         dynamic response = await productRepository.fetchProductsByCategory(event.categoryId);
 
-        // 3. Check the status from the API response.
         if (response != null && response["status"] == true) {
-          // Parse the successful response.
           ProductDataModel mData = ProductDataModel.fromJson(response);
 
           // 4. Emit success state with the list of products for the UI to display.
-          // Note: We use ProductSuccessState as expected by your UI code.
           emit(ProductSuccessState(products: mData.data ?? []));
 
         } else {

@@ -11,6 +11,9 @@ import 'package:ecommerce/domain/constants/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'bloc/oder/order_bloc.dart';
+import 'data/remote/repository/order_repository.dart';
+
 
 void main() {
   runApp(
@@ -50,6 +53,10 @@ void main() {
           ),
           BlocProvider<CategoryBloc>(
             create: (context) => CategoryBloc(categoryRepository: context.read<CategoryRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => OrderBloc(orderRepository: OrderRepository(apiHelper: ApiHelper())),
+            // child: YourCartScreen(),
           ),
         ],
         child: MyApp(),

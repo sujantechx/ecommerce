@@ -12,7 +12,6 @@ class CategoryRepository {
 
   Future<List<CategoryModel>> getAllCategories() async {
     try {
-      // Make the API call
       final response = await apiHelper.getAPI(url: AppUrls.getCategoryUrl);
 
       // Check if the 'data' key exists and is a list

@@ -1,10 +1,4 @@
-
-
-
-import 'dart:developer';
-
 import '../../../domain/constants/app_urls.dart';
-import '../../../model/products_model.dart';
 import '../helper/api_helper.dart';
 
 class ProductRepository {
@@ -25,7 +19,6 @@ class ProductRepository {
 
   Future<dynamic> fetchProductsByCategory(String categoryId) async {
     try {
-      // Your API expects an integer, so we parse the incoming string ID.
       final int? categoryIdInt = int.tryParse(categoryId);
 
       // If parsing fails (which it shouldn't), you might want to handle it.

@@ -147,6 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               content: Text("Login successfully"),
                               backgroundColor: Colors.green,
                             ));
+                            context.read<UserBloc>().add(FetchUserProfileEvent());
                             // You might also want to navigate to the home screen here
                             Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
                             _loggedIn();

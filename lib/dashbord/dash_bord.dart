@@ -91,27 +91,6 @@ class _DashboardPageState extends State<DashboardPage> {
             }, icon: Icon(Icons.person_outline, color: selectedNavIndex==4 ? Colors.orange : Colors.grey,)),
           ],
         ),
-        /* iconSize: 25,
-          showSelectedLabels: false,
-          currentIndex: selectedNavIndex,
-          selectedItemColor: Colors.orange,
-          unselectedItemColor: Colors.grey,
-          onTap: (index) {
-            selectedNavIndex=index;
-            setState(() {
-
-            });
-            //provider.updatePageIndex(index: index);
-          },
-
-
-          items: [
-            BottomNavigationBarItem(activeIcon: Icon(Icons.category_outlined),label: "Category",icon: Icon(Icons.category),),
-            BottomNavigationBarItem(activeIcon: Icon(Icons.favorite_border_outlined),label: "Favorite",icon: Icon(Icons.favorite_border),),
-            BottomNavigationBarItem(activeIcon: Icon(Icons.shopping_cart_rounded),label: "Home",icon: Icon(Icons.shopping_cart),),
-            BottomNavigationBarItem(icon: Icon(Icons.person),label: "Profile"),
-
-          ]*/
 
       ),
 
@@ -119,9 +98,3 @@ class _DashboardPageState extends State<DashboardPage> {
 
   }
 }
-/* BottomNavigationBarItem(icon: Container(
-                      width: 50,height: 50,
-                      decoration:BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.circular(5)) ,
-                      child: Icon(Icons.add)),label: "Add"),*/

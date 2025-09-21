@@ -4,7 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../bloc/user/user_bloc.dart';
 import '../bloc/user/user_event.dart';
 import '../bloc/user/user_state.dart';
-import '../model/user_model.dart'; // Make sure you have this import
+import '../model/user_model.dart';
+import 'oder_pages.dart'; // Make sure you have this import
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -170,7 +171,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildMenuItem(
             icon: Icons.shopping_bag_outlined,
             title: 'My Orders',
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => OrderHistoryPage(),));
+            },
           ),
           _buildMenuItem(
             icon: Icons.refresh_outlined,

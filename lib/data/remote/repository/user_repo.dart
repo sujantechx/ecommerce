@@ -1,11 +1,7 @@
-
-
 import 'dart:convert';
-
 import 'package:ecommerce/data/remote/helper/api_helper.dart';
 import 'package:ecommerce/domain/constants/app_urls.dart';
 import 'package:http/http.dart' as http;
-
 import '../../../model/user_model.dart';
 
 class UserRepository {
@@ -24,6 +20,7 @@ class UserRepository {
     } catch (e) {
       rethrow;
     }}
+
  Future<dynamic> registerUser({
     required String email,
     required String name,
@@ -43,16 +40,6 @@ class UserRepository {
     }
   }
 
-// Dart
-
-
-
-// ... inside your UserRepository class
-
-
-
-// ... inside your UserRepository class
-
   Future<UserModel?> fetchUserProfile(String token) async {
     final url = Uri.parse(AppUrls.userProfileUrl);
 
@@ -66,9 +53,7 @@ class UserRepository {
     final body = json.encode({});
 
     try {
-      // 1. Changed http.get to http.post
-      // 2. Added the 'body' to the request
-      final response = await http.post(url, headers: headers, body: body);
+        final response = await http.post(url, headers: headers, body: body);
 
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');
@@ -90,36 +75,5 @@ class UserRepository {
       print('An exception occurred: $e');
       return null;
     }
-  }// In your UserRepository's fetchUserProfile function
-
-/*
-  Future<UserModel?> fetchUserProfile(String token) async {
-    print('--- Sending Profile Request ---');
-    print('URL: ${AppUrls.userProfileUrl}');
-    print('Token: $token');
-
-    // Add the missing headers here! ✅
-    final mHeaders = {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json', // Very likely needed
-      'Accept': 'application/json',        // Also very likely
-    };
-
-    print('Headers: $mHeaders');
-    print('-----------------------------');
-
-    final response = await apiHelper.getAPI(
-      url: AppUrls.userProfileUrl,
-      isAuth: true,
-      mHeaders: mHeaders,
-    );
-
-    print('API response: $response');
-
-    if (response['status'] == true && response['data'] != null) {
-      return UserModel.fromJson(response['data']);
-    }
-    return null;
   }
-*/
 }

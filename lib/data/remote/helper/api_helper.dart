@@ -40,7 +40,8 @@ class ApiHelper {
     required String url,
     Map<String, String>? mHeaders,
     bool isAuth = false,
-  }) async {
+  }) async
+  {
     mHeaders ??= {};
 
     if (isAuth) {
